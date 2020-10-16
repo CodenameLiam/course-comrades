@@ -1,0 +1,50 @@
+.login {
+  display: flex;
+  height: 100vh;
+
+  .left {
+    background: $colour-primary;
+    background: $colour-primary-gradient;
+    width: 50%;
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 50%;
+
+    .welcome-field {
+      color: $colour-primary;
+      font-size: 3rem;
+      line-height: 3rem;
+    }
+
+    .welcome-underline {
+      margin: 0.5rem auto;
+      width: 18rem;
+      height: 0.25rem;
+      background: $colour-primary;
+      background: $colour-primary-gradient;
+    }
+
+    .form {
+      padding: 2rem;
+      margin: 0rem auto;
+      width: 70%;
+
+      //   .username,
+      //   .password {
+      //     margin-bottom: 1rem;
+      //     .MuiInputBase-root {
+      //       border-radius: 100rem;
+      //       fieldset {
+      //         transition: "box-shadow 0.3s" !important;
+      //         border-color: "transparent" !important;
+      //       }
+      //     }
+      //   }
+    }
+  }
+}
