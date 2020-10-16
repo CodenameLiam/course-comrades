@@ -1,6 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { Home, Login, PageNotFound } from "./Pages";
+import logo from './logo.svg';
+import './App.css';
+import { firebaseConfig } from './FireBaseConfig';
+import * as firebase from 'firebase/app';
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 function App() {
     return (

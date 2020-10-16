@@ -15,7 +15,7 @@ export default function Login() {
             variant="outlined"
             fullWidth
           />
-          <LoginTextFieldOLD
+          <LoginTextField
             className="password"
             placeholder="Password"
             variant="outlined"
