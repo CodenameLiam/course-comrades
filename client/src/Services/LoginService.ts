@@ -5,7 +5,7 @@ import * as firebase from 'firebase/app';
 // Add the Firebase services that you want to use
 import 'firebase/auth';
 
-export const login = (
+export const register = (
   email: string,
   password: string,
   username: string,
@@ -14,7 +14,7 @@ export const login = (
 ): void => {
   firebase
     .auth()
-    .signInWithEmailAndPassword(email, password)
+    .createUserWithEmailAndPassword(email, password)
     .then((user) => handleSuccess(user))
     .then(() => {
       const user = firebase.auth().currentUser;
@@ -25,7 +25,7 @@ export const login = (
     .catch((e) => handleError(e));
 };
 
-export const register = (
+export const login = (
   email: string,
   password: string,
   handleSuccess: (user: firebase.auth.UserCredential) => void,
