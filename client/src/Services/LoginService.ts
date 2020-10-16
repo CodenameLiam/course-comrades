@@ -8,6 +8,7 @@ import 'firebase/auth';
 export const login = (
   email: string,
   password: string,
+  username: string,
   handleSuccess: (user: firebase.auth.UserCredential) => void,
   handleError: (e: Error) => void,
 ): void => {
@@ -15,6 +16,12 @@ export const login = (
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then((user) => handleSuccess(user))
+    .then(() => {
+      const user = firebase.auth().currentUser;
+      user?.updateProfile({
+        displayName: username,
+      });
+    })
     .catch((e) => handleError(e));
 };
 
