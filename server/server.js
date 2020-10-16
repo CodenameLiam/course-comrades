@@ -12,6 +12,14 @@ const path = require("path");
 // Define application
 const app = express();
 
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./firebase-admin-token.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://uqcs-hackathon-2020.firebaseio.com"
+});
 // Define port
 const port = 5000;
 
