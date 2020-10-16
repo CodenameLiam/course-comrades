@@ -1,0 +1,18 @@
+{
+    "name": "course-comrades",
+    "version": "1.0.0",
+    "description": "News Reader Application",
+    "main": "server.js",
+    "scripts": {
+        "start": "nodemon server.js"
+    },
+    "author": "Liam Percy",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^0.20.0",
+        "express": "^4.17.1"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.4"
+    }
+}
