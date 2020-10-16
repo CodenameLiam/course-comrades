@@ -1,6 +1,11 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { firebaseConfig } from './FireBaseConfig';
+import * as firebase from 'firebase/app';
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 function App() {
   return (
