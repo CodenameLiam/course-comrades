@@ -29,6 +29,21 @@ app.use(express.static("../client/build"));
 // Serve static assets in the public folder from the clientside
 // app.use(express.static("../client/public"));
 
+
+
+
+
+// Handles Creating notes, does not handle null as an input
+app.post('/create_note', function (req,res){
+    const name = req.query.name;
+    const fileLink = req.query.fileLink;
+    const courseCode = req.query.courseCode;
+    const author = req.query.author;
+    const hashtags = req.query.hashtags;
+    console.log(name, fileLink, courseCode, author, hashtags[0], hashtags[2]);
+    console.log(req.body)
+})
+
 // Server content using react clientside
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, "../client/build", "index.html"));
