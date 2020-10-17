@@ -4,6 +4,7 @@
   "description": "News Reader Application",
   "main": "server.js",
   "homepage": ".",
+  "type": "module",
   "scripts": {
     "start": "nodemon server.js"
   },
