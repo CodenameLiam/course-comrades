@@ -1,6 +1,19 @@
-import { Button, IconButton, InputAdornment, withStyles } from "@material-ui/core";
+import {
+  Button,
+  IconButton,
+  InputAdornment,
+  withStyles,
+  Paper,
+  Table,
+  TableContainer,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableHead,
+} from "@material-ui/core";
 import { NoteAdd, Search } from "@material-ui/icons";
 import React from "react";
+import Popup from "reactjs-popup";
 import Page from "../Components/Navigation/Page";
 import { SearchTextField } from "./Home";
 
@@ -33,15 +46,52 @@ export default function MyNotes() {
             />
           </div>
           <div className="upload-notes">
-            <UploadButton
-              className="login-button"
-              variant="contained"
-              fullWidth
-              startIcon={<NoteAdd />}
+            <Popup
+              trigger={
+                <UploadButton
+                  className="login-button"
+                  variant="contained"
+                  fullWidth
+                  startIcon={<NoteAdd />}
+                >
+                  Upload New Notes
+                </UploadButton>
+              }
+              modal
+              // closeOnDocumentClick={false}
             >
-              Upload New Notes
-            </UploadButton>
+              <div>Popup content here !!</div>
+            </Popup>
           </div>
+        </div>
+        <div className="notes">
+          <TableContainer component={Paper}>
+            <Table className="table" aria-label="top notes">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell align="center">Course Code</TableCell>
+                  <TableCell align="center">Date Uploaded</TableCell>
+                  <TableCell align="center">Likes</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/* {state.map((user, index) => {
+                  return (
+                    <TableRow key={user.id}>
+                      <TableCell component="th" scope="row">
+                        {index}
+                      </TableCell>
+                      <TableCell align="center">{user.email}</TableCell>
+                      <TableCell align="center">{user.firstName}</TableCell>
+                      <TableCell align="center">{user.lastName}</TableCell>
+                      <TableCell align="center">{getGroups(user.groups)}</TableCell>
+                    </TableRow>
+                  );
+                })} */}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       </div>
     </Page>

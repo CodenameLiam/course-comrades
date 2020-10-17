@@ -5,6 +5,7 @@ import * as serviceWorker from "./serviceWorker";
 import * as firebase from "firebase/app";
 import "./Styles/main.scss";
 import "react-toastify/dist/ReactToastify.css";
+import "reactjs-popup/dist/index.css";
 
 ReactDOM.render(
   <React.StrictMode>
