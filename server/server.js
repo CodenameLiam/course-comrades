@@ -374,7 +374,7 @@ const getNotes = async (noteIds, username) => {
         likes: noteData.likes,
         downloads: noteData.downloads,
         uploadDate: noteData.uploadDate,
-        noteId: noteId,
+        id: noteId,
         faculty: noteData.faculty,
         semester: noteData.semester,
         liked: likeFlag,

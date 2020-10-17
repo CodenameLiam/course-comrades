@@ -6,6 +6,7 @@ import Note from '../../Types/Note';
 import moment from 'moment';
 import React, { useState } from 'react';
 import IconButton from '@material-ui/core/IconButton';
+import { download } from '../../Services/FileService';
 
 type RowComponentProps = {
   note: Note;
@@ -60,7 +61,7 @@ const Row = (props: RowComponentProps) => {
           <ThumbUpIcon {...(liked ? { style: { fill: 'green' } } : {})} />
         </IconButton>
       </TableCell>
-      <TableCell align="center">
+      <TableCell align="center" onClick={() => download(note.id, note.name)}>
         <CloudDownloadIcon />
       </TableCell>
     </TableRow>
