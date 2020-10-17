@@ -92,7 +92,7 @@ app.post('/api/create_note', async (req, res) => {
     // add an id attribute to the notes object to make it easier for the frontend
     await notesDB.doc(note.id).update({ id: note.id });
 
-    hashtags.forEach(function (hashtag) {
+    hashtags.forEach(function(hashtag) {
       console.log(hashtag);
       hashtagsDB
         .doc(hashtag)
@@ -112,10 +112,18 @@ app.post('/api/create_note', async (req, res) => {
         { users: [author] },
       );
 
+    await userLikesDB
+      .doc(author)
+      .set(
+        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
+        { merge: true },
+      );
+
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
   }
+
 
   res.status(200).send('succesfully created note');
 });
@@ -136,10 +144,9 @@ app.post('/api/like_note', async (req, res) => {
       });
 
       // Adds note to userlikes and like to notelikes collections
-
       await userLikesDB.doc(username).set(
         {
-          users: admin.firestore.FieldValue.arrayUnion(noteId),
+          notes: admin.firestore.FieldValue.arrayUnion(noteId),
         },
         { merge: true },
       );
@@ -168,10 +175,10 @@ app.post('/api/unlike_note', async (req, res) => {
 
   // Get current likes
   try {
-    const currentLikes = getCurrentLikes(req);
+    const currentLikes = parseInt(getCurrentLikes(req));
     const noteRef = notesDB.doc(noteId);
     const exists = (await noteLikesDB.doc(noteId).get());
-    console.log(noteRef.exists, exists.data().users.includes(username))
+
     if (exists.data().users.includes(username)) {
       // Updates likes
       await noteRef.update({
@@ -181,17 +188,16 @@ app.post('/api/unlike_note', async (req, res) => {
       // Remove note to userlikes and like to notelikes collections
 
       await userLikesDB.doc(username).update({
-        users: admin.firestore.FieldValue.arrayRemove(noteId),
+        notes: admin.firestore.FieldValue.arrayRemove(noteId),
       });
 
-      await noteLikesDB.doc(username).update({
+      await noteLikesDB.doc(noteId).update({
         users: admin.firestore.FieldValue.arrayRemove(username),
       });
 
-      res.status(200).send('successfully liked note');
-    }
-    else {
-      res.status(400).send('')
+      res.status(200).send('successfully unliked note');
+    } else {
+      res.status(400).send('');
     }
   } catch (e) {
     console.log(e);
@@ -241,7 +247,7 @@ app.post('/api/query/time/', async (req, res) => {
     case 'month':
       fromDate.setDate(fromDate.getDate - 31);
       break;
-    case 'month':
+    case 'year':
       fromDate.setDate(fromDate.getDate - 365);
       break;
   }
@@ -256,12 +262,38 @@ app.post('/api/query/time/', async (req, res) => {
 
 app.get('/api/search', async (req, res) => {
   try {
+    let resultId = [];
     const faculty = req.body.faculty;
     const hashtags = req.body.hashtags;
     const semester = req.body.semester;
     const courseCode = req.body.courseCode;
     console.log(faculty, hashtags, semester, courseCode);
-    console.log(courseCodeQuery(courseCode));
+
+    const temp = await courseCodeQuery(courseCode);
+    if (courseCode !== undefined) {
+      resultId = resultId.concat(await courseCodeQuery(courseCode));
+    }
+    if (hashtags !== undefined) {
+      resultId = Array.from(new Set(resultId.concat(await hashtagQuery(hashtags))));
+    }
+
+    let notes = await getNotes(resultId);
+
+
+    notes = notes.filter(note => {
+      let valid = true;
+      if (semester !== undefined) {
+        valid = (note.semester === semester);
+      }
+      if (valid && faculty !== undefined) {
+        valid = (note.faculty === faculty);
+      }
+      console.log(valid)
+      return valid;
+    });
+    console.log(notes);
+
+    res.status(200).send(res);
   } catch (e) {
     res.status(500).send(e);
   }
@@ -269,21 +301,23 @@ app.get('/api/search', async (req, res) => {
 
 const getNotes = async (noteIds) => {
   const result = [];
-  noteIds.forEach(async function(noteId) {
+  for (const noteId of noteIds) {
     const docRef = await notesDB.doc(noteId).get();
     const noteData = docRef.data();
     result.push({
-      name: noteData.name,
-      author: noteData.author,
-      description: noteData.description,
-      courseCode: noteData.courseCode,
-      hashtags: noteData.hashtags,
-      likes: noteData.likes,
-      downloads: noteData.downloads,
-      uploadDate: noteData.uploadDate,
-      noteId: noteId,
+      'name': noteData.name,
+      'author': noteData.author,
+      'description': noteData.description,
+      'courseCode': noteData.courseCode,
+      'hashtags': noteData.hashtags,
+      'likes': noteData.likes,
+      'downloads': noteData.downloads,
+      'uploadDate': noteData.uploadDate,
+      'noteId': noteId,
+      'faculty': noteData.faculty,
+      'semester': noteData.semester,
     });
-  });
+  }
   return result;
 };
 
@@ -296,50 +330,41 @@ const getCurrentLikes = async (req) => {
 // Query by hashtag
 const hashtagQuery = async (hashtags) => {
   try {
-    var noteIds = [];
-    hashtags.forEach((hashtag) => {
-      const docRef = hashtagsDB.doc(hashtag).get();
-      const notes = docRef.data().notes;
-      notes.forEach((noteID) => {
-        noteIds.push(noteID);
-      });
-    });
+    const noteIds = [];
+    for (const hashtag of hashtags) {
+      const docRef = await hashtagsDB.doc(hashtag).get();
+      if (docRef.exists) {
+        const notes = docRef.data().notes;
+
+        notes.forEach((noteID) => {
+          noteIds.push(noteID);
+        });
+      }
+    }
     return noteIds;
   } catch (e) {
+    console.log(e);
   }
 };
 
+//Gets the note id's of notes with specified course code
 const courseCodeQuery = async (courseCode) => {
+
   try {
     const docRef = await course2NotesDB.doc(courseCode).get();
-    const notes = docRef.data().notes;
-    console.log('NOtes:');
-    return notes;
+    if (docRef.exists) {
+      const notes = docRef.data().notes;
+      return notes;
+    } else {
+      return [];
+    }
+
   } catch (e) {
+    console.log(e);
+    return [];
   }
 };
 
-// Filter by semester, takes in array of notes, not id's
-const semesterQuery = async (semester, notes) => {
-  const results = [];
-  notes.forEach((note) => {
-    if (note.semester === semester) {
-      results.push(note);
-    }
-  });
-  return results;
-};
-
-// Filter by faculty, takes in array of notes, not id's
-const facultyQuery = async (query, notes) => {
-  const results = [];
-  notes.forEach((note) => {
-    if (note.query === query) {
-      results.push(note);
-    }
-  });
-  return results;
-};
 // Server content using react clientside
 app.get('/', (req, res) => {
   if (req.accept('html')) secres.sendFile(path.join(__dirname, '../client/build', 'index.html'));
