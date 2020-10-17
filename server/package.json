@@ -1,19 +1,21 @@
 {
-    "name": "course-comrades",
-    "version": "1.0.0",
-    "description": "News Reader Application",
-    "main": "server.js",
-    "scripts": {
-        "start": "nodemon server.js"
-    },
-    "author": "Liam Percy",
-    "license": "ISC",
-    "dependencies": {
-        "axios": "^0.20.0",
-        "express": "^4.17.1",
-        "firebase-admin": "^9.2.0"
-    },
-    "devDependencies": {
-        "nodemon": "^2.0.4"
-    }
+  "name": "course-comrades",
+  "version": "1.0.0",
+  "description": "News Reader Application",
+  "main": "server.js",
+  "homepage": ".",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Liam Percy",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^9.2.0",
+    "moment": "^2.29.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
 }
