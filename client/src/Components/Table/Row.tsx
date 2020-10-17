@@ -47,6 +47,8 @@ const Row = (props: RowComponentProps) => {
         {note.name}
       </TableCell>
       <TableCell align="center">{note.courseCode}</TableCell>
+      <TableCell align="center">{note.author}</TableCell>
+      <TableCell align="center">{note.hashtags.join(', ')}</TableCell>
       <TableCell align="center">
         {moment(new Date(parseInt(note.uploadDate._seconds) * 1000)).format(
           'DD/MM/YYYY, HH:mm',
