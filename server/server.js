@@ -9,6 +9,9 @@ import path from 'path';
 // Define application
 const app = express();
 
+// Lodash array utils
+const _ = require('lodash');
+
 // Use your firebase private key here. Initialize our firebase account, as well as our firestore databases.
 import admin from "firebase-admin";
 import serviceAccount from './firebase-admin-token.js';
@@ -51,6 +54,7 @@ app.post('/api/create_note', async (req, res) => {
   const faculty = req.body.faculty;
   const semester = req.body.semester;
 
+  const uploadDate = admin.firestore.Timestamp.fromDate(new Date());
   try {
     if (name === undefined || author === undefined || courseCode === undefined || description === undefined
         || hashtags === undefined) {
@@ -67,11 +71,12 @@ app.post('/api/create_note', async (req, res) => {
       semester: semester,
       likes: 0,
       downloads: 0,
-      uploadDate: moment().format()
+      // need to use firebase timestamp date objects to filter by dates
+      uploadDate: uploadDate,
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    await notesDB.doc(note.id).update({id: note.id});
+    await notesDB.doc(note.id).update({ id: note.id });
 
     hashtags.forEach(function (hashtag) {
       console.log(hashtag);
@@ -89,14 +94,13 @@ app.post('/api/create_note', async (req, res) => {
   res.status(200).send('succesfully created note');
 });
 
-
 // Handles likes a note
 app.post('/api/like_note', async (req, res) => {
   const noteId = req.body.noteId;
   const username = req.body.username;
   // Get current likes
   try {
-    const currentLikes = helpers.getCurrentLikes(req);
+    const currentLikes = getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
 
     // Updates likes
@@ -127,7 +131,7 @@ app.post('/api/unlike_note', async (req, res) => {
   const noteId = req.body.noteId;
   // Get current likes
   try {
-    const currentLikes = helpers.getCurrentLikes(req);
+    const currentLikes = getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
 
     // Updates likes
@@ -155,7 +159,6 @@ app.post('/api/unlike_note', async (req, res) => {
 
 // Handles downloads counter incrementing
 app.post('/api/add_download', async (req, res) => {
-
   const noteId = req.body.noteId;
   try {
     const docRef = notesDB.doc(noteId);
@@ -193,6 +196,44 @@ app.get('/api/search', async (req, res) => {
 // Server content using react clientside
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+// Query by likes and time
+app.get('/api/query/time/', async (req, res) => {
+  const timePeriod = req.query.timePeriod;
+  const numResults = parseInt(req.query.numResults) || 100;
+
+  const fromDate = new Date();
+  fromDate.setHours(0, 0, 0, 0);
+  switch (timePeriod) {
+    case 'day':
+      break;
+    case 'week':
+      fromDate.setDate(fromDate.getDate - 7);
+      break;
+    case 'month':
+      fromDate.setDate(fromDate.getDate - 31);
+      break;
+    case 'month':
+      fromDate.setDate(fromDate.getDate - 365);
+      break;
+  }
+
+  const timestampDate = admin.firestore.Timestamp.fromDate(fromDate);
+  const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
+  const notesArray = snapshot.docs.map((doc) => doc.data());
+  const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(
+    -Math.abs(numResults),
+  );
+
+  res.status(200).send(sortedNotesArray);
+});
+
+// Query by hastag
+app.get('/api/query/hashtag', async (req, res) => {
+  try {
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 
 const getNotes = async(noteIds) => {
@@ -237,6 +278,11 @@ const hashtagQuery =  async (hashtags) => {
 
   }
 };
+var getCurrentLikes = async (req) => {
+  const noteId = req.body.noteId;
+  // Get current likes
+  const currentLikes = await notesDB.doc(noteId).get().data['likes'];
+};
 
 const courseCodeQuery = async (courseCode) => {
   try {
@@ -269,5 +315,9 @@ const facultyQuery = async (query, notes) =>{
   })
   return results;
 }
+// Server content using react clientside
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
