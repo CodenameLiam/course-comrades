@@ -1,49 +1,49 @@
 .login {
-	display: flex;
-	height: 100vh;
+  display: flex;
+  height: 100vh;
 
-	.left {
-		background: $colour-primary;
-		background: $colour-primary-gradient;
-		width: 50%;
-	}
+  .left {
+    background: $colour-primary;
+    background: $colour-primary-gradient;
+    width: 50%;
+  }
 
-	.right {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		text-align: center;
-		width: 50%;
+  .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 50%;
 
-		.welcome-field {
-			color: $colour-primary;
-			font-size: 3rem;
-			line-height: 3rem;
-		}
+    .welcome-field {
+      color: $colour-primary;
+      font-size: 3rem;
+      line-height: 3rem;
+    }
 
-		.welcome-underline {
-			margin: 0.5rem auto;
-			margin-bottom: 2rem;
-			width: 18rem;
-			height: 0.25rem;
-			background: $colour-primary;
-			background: $colour-primary-gradient;
-		}
+    .welcome-underline {
+      margin: 0.5rem auto;
+      margin-bottom: 2rem;
+      width: 18rem;
+      height: 0.25rem;
+      background: $colour-primary;
+      background: $colour-primary-gradient;
+    }
 
-		.form {
-			padding: 2rem;
-			margin: 0rem auto;
-			width: 50%;
+    .form {
+      padding: 2rem;
+      margin: 0rem auto;
+      width: 50%;
 
-			.username,
-			.password {
-				margin-bottom: 2rem;
-			}
+      .username,
+      .password {
+        margin-bottom: 2rem;
+      }
 
-			input:-webkit-autofill {
-				-webkit-box-shadow: 200px 200px 100px white inset;
-				box-shadow: 200px 200px 100px white inset;
-			}
-		}
-	}
+      input:-webkit-autofill {
+        -webkit-box-shadow: 200px 200px 100px white inset;
+        box-shadow: 200px 200px 100px white inset;
+      }
+    }
+  }
 }
