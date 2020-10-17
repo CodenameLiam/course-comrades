@@ -74,7 +74,7 @@ app.post('/api/create_note', async (req, res) => {
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    await notesDB.doc(note.id).update({ id: note.id });
+    await notesDB.doc(note.id).update({id: note.id});
 
     hashtags.forEach(function (hashtag) {
       console.log(hashtag);
@@ -211,7 +211,7 @@ app.get('/api/query/time/', async (req, res) => {
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
   const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(
-    -Math.abs(numResults),
+      -Math.abs(numResults),
   );
 
   res.status(200).send(sortedNotesArray);
@@ -226,15 +226,14 @@ app.get('/api/search', async (req, res) => {
     const courseCode = req.body.courseCode;
     console.log(faculty, hashtags, semester, courseCode);
     console.log(courseCodeQuery(courseCode));
-  }
-  catch (e){
+  } catch (e) {
     res.status(500).send(e);
   }
 })
 
-const getNotes = async(noteIds) => {
+const getNotes = async (noteIds) => {
   const result = [];
-  noteIds.forEach( async function (noteId){
+  noteIds.forEach(async function (noteId) {
     const docRef = await notesDB.doc(noteId).get();
     const noteData = docRef.data();
     result.push(
@@ -247,7 +246,7 @@ const getNotes = async(noteIds) => {
           likes: noteData.likes,
           downloads: noteData.downloads,
           uploadDate: noteData.uploadDate,
-          noteId : noteId
+          noteId: noteId
         }
     );
   })
@@ -262,7 +261,7 @@ const getCurrentLikes = async (req) => {
 }
 
 // Query by hashtag
-const hashtagQuery =  async (hashtags) => {
+const hashtagQuery = async (hashtags) => {
   try {
     var noteIds = [];
     hashtags.forEach((hashtag) => {
@@ -284,16 +283,15 @@ const courseCodeQuery = async (courseCode) => {
     const notes = docRef.data().notes;
     console.log("NOtes:");
     return notes;
-  }
-  catch (e){
+  } catch (e) {
   }
 }
 
 // Filter by semester, takes in array of notes, not id's
-const semesterQuery = async (semester, notes) =>{
+const semesterQuery = async (semester, notes) => {
   const results = [];
-  notes.forEach((note)=>{
-    if (note.semester === semester){
+  notes.forEach((note) => {
+    if (note.semester === semester) {
       results.push(note);
     }
   })
@@ -301,10 +299,10 @@ const semesterQuery = async (semester, notes) =>{
 }
 
 // Filter by faculty, takes in array of notes, not id's
-const facultyQuery = async (query, notes) =>{
+const facultyQuery = async (query, notes) => {
   const results = [];
-  notes.forEach((note)=>{
-    if (note.query === query){
+  notes.forEach((note) => {
+    if (note.query === query) {
       results.push(note);
     }
   })
