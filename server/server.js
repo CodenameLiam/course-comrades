@@ -9,6 +9,9 @@ const path = require('path');
 // Define application
 const app = express();
 
+// Lodash array utils
+const _ = require('lodash');
+
 // Use your firebase private key here. Initialize our firebase account, as well as our firestore databases.
 const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-admin-token.json');
@@ -155,11 +158,11 @@ app.post('/api/add_download', async (req, res) => {
 
 // Query by likes and time
 app.get('/api/query/time/', async (req, res) => {
+  const timePeriod = req.query.timePeriod;
+  const numResults = parseInt(req.query.numResults) || 100;
+
   const fromDate = new Date();
   fromDate.setHours(0, 0, 0, 0);
-
-  const timePeriod = req.query.timePeriod;
-
   switch (timePeriod) {
     case 'day':
       break;
@@ -177,8 +180,11 @@ app.get('/api/query/time/', async (req, res) => {
   const timestampDate = admin.firestore.Timestamp.fromDate(fromDate);
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
+  const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(
+    -Math.abs(numResults),
+  );
 
-  res.status(200).send(notesArray);
+  res.status(200).send(sortedNotesArray);
 });
 
 // Query by hastag
