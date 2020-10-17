@@ -54,7 +54,7 @@ app.use(
 );
 
 // Handles Creating notes
-app.post('/api/create_note', async (req, res) => {
+app.post('/api/create-note', async (req, res) => {
   const name = req.body.name;
   const author = req.body.author;
   const courseCode = req.body.courseCode;
@@ -62,9 +62,16 @@ app.post('/api/create_note', async (req, res) => {
   const hashtags = req.body.hashtags;
   const faculty = req.body.faculty;
   const semester = req.body.semester;
-  if (name === undefined || author === undefined || courseCode === undefined || description === undefined
-   || hashtags === undefined || faculty === undefined || semester === undefined){
-    res.status(400).send("Bad Request");
+  if (
+    name === undefined ||
+    author === undefined ||
+    courseCode === undefined ||
+    description === undefined ||
+    hashtags === undefined ||
+    faculty === undefined ||
+    semester === undefined
+  ) {
+    res.status(400).send('Bad Request');
   }
 
   const uploadDate = admin.firestore.Timestamp.fromDate(new Date());
@@ -96,7 +103,7 @@ app.post('/api/create_note', async (req, res) => {
     // add an id attribute to the notes object to make it easier for the frontend
     await notesDB.doc(note.id).update({ id: note.id });
 
-    hashtags.forEach(function(hashtag) {
+    hashtags.forEach(function (hashtag) {
       console.log(hashtag);
       hashtagsDB
         .doc(hashtag)
@@ -105,45 +112,33 @@ app.post('/api/create_note', async (req, res) => {
 
     await course2NotesDB
       .doc(courseCode)
-      .set(
-        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-        { merge: true },
-      );
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
 
-    await noteLikesDB
-      .doc(note.id)
-      .set(
-        { users: [author] },
-      );
+    await noteLikesDB.doc(note.id).set({ users: [author] });
 
     await userLikesDB
       .doc(author)
-      .set(
-        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-        { merge: true },
-      );
-
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
   }
 
-
   res.status(200).send('succesfully created note');
 });
 
 // Handles likes a note
-app.post('/api/like_note', async (req, res) => {
+app.post('/api/like-note', async (req, res) => {
   const noteId = req.body.noteId;
   const username = req.body.username;
-  if (noteId === undefined || username === undefined){
-    res.status(400).send("Bad Request");
+  if (noteId === undefined || username === undefined) {
+    res.status(400).send('Bad Request');
   }
   // Get current likes
   try {
     const currentLikes = await getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
-    const exists = (await noteLikesDB.doc(noteId).get());
+    const exists = await noteLikesDB.doc(noteId).get();
     if (!exists.data().users.includes(username)) {
       // Updates likes
       await noteRef.update({
@@ -168,7 +163,6 @@ app.post('/api/like_note', async (req, res) => {
     } else {
       res.status(400).send('user has already liked note or note does not exist');
     }
-
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -176,17 +170,17 @@ app.post('/api/like_note', async (req, res) => {
 });
 
 // Handles unliking a note
-app.post('/api/unlike_note', async (req, res) => {
+app.post('/api/unlike-note', async (req, res) => {
   const username = req.body.username;
   const noteId = req.body.noteId;
-  if (username === undefined || noteId === undefined){
-    res.status(400).send("Bad Request");
+  if (username === undefined || noteId === undefined) {
+    res.status(400).send('Bad Request');
   }
   // Get current likes
   try {
     const currentLikes = await getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
-    const exists = (await noteLikesDB.doc(noteId).get());
+    const exists = await noteLikesDB.doc(noteId).get();
 
     if (exists.data().users.includes(username)) {
       // Updates likes
@@ -215,10 +209,10 @@ app.post('/api/unlike_note', async (req, res) => {
 });
 
 // Handles downloads counter incrementing
-app.post('/api/add_download', async (req, res) => {
+app.post('/api/add-download', async (req, res) => {
   const noteId = req.body.noteId;
-  if (noteId === undefined){
-    res.status(400).send("Bad Request");
+  if (noteId === undefined) {
+    res.status(400).send('Bad Request');
   }
   try {
     const docRef = await notesDB.doc(noteId).get();
@@ -226,7 +220,7 @@ app.post('/api/add_download', async (req, res) => {
 
     // Updates downloads
     await docRef.update({
-      downloads: currentDownloads + 1
+      downloads: currentDownloads + 1,
     });
     res.status(200).send('successfully added download');
   } catch (e) {
@@ -272,19 +266,18 @@ app.post('/api/query/time/', async (req, res) => {
   res.status(200).send(sortedNotesArray);
 });
 
-app.post('api/get_liked_notes', async (req, res) => {
+app.post('api/get-liked-notes', async (req, res) => {
   const username = req.body.username;
-  if (username === undefined){
-    res.status(400).send("Bad Request");
+  if (username === undefined) {
+    res.status(400).send('Bad Request');
   }
   try {
     const docRef = userLikesDB.doc(username).get();
     if ((await docRef).exists) {
       const results = await getNotes((await docRef).data().notes);
       res.status(200).send();
-    }
-    else {
-      res.status(400).send("Bad Request");
+    } else {
+      res.status(400).send('Bad Request');
     }
   } catch (e) {
     res.status(500).send(e);
@@ -311,14 +304,13 @@ app.get('/api/search', async (req, res) => {
 
     let notes = await getNotes(resultId);
 
-
-    notes = notes.filter(note => {
+    notes = notes.filter((note) => {
       let valid = true;
       if (semester !== undefined) {
-        valid = (note.semester === semester);
+        valid = note.semester === semester;
       }
       if (valid && faculty !== undefined) {
-        valid = (note.faculty === faculty);
+        valid = note.faculty === faculty;
       }
       console.log(valid);
       return valid;
@@ -337,17 +329,17 @@ const getNotes = async (noteIds) => {
     const docRef = await notesDB.doc(noteId).get();
     const noteData = docRef.data();
     result.push({
-      'name': noteData.name,
-      'author': noteData.author,
-      'description': noteData.description,
-      'courseCode': noteData.courseCode,
-      'hashtags': noteData.hashtags,
-      'likes': noteData.likes,
-      'downloads': noteData.downloads,
-      'uploadDate': noteData.uploadDate,
-      'noteId': noteId,
-      'faculty': noteData.faculty,
-      'semester': noteData.semester,
+      name: noteData.name,
+      author: noteData.author,
+      description: noteData.description,
+      courseCode: noteData.courseCode,
+      hashtags: noteData.hashtags,
+      likes: noteData.likes,
+      downloads: noteData.downloads,
+      uploadDate: noteData.uploadDate,
+      noteId: noteId,
+      faculty: noteData.faculty,
+      semester: noteData.semester,
     });
   }
   return result;
@@ -381,7 +373,6 @@ const hashtagQuery = async (hashtags) => {
 
 //Gets the note id's of notes with specified course code
 const courseCodeQuery = async (courseCode) => {
-
   try {
     const docRef = await course2NotesDB.doc(courseCode).get();
     if (docRef.exists) {
@@ -390,7 +381,6 @@ const courseCodeQuery = async (courseCode) => {
     } else {
       return [];
     }
-
   } catch (e) {
     console.log(e);
     return [];
@@ -403,5 +393,4 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
-export default class server {
-}
+export default class server {}
