@@ -13,27 +13,31 @@ import {
   Visibility,
   VisibilityOff,
 } from '@material-ui/icons';
-import { login } from '../Services/LoginService';
+import { register } from '../Services/LoginService';
 import { ToastContainer, toast } from 'react-toastify';
 import { useHistory, useLocation } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 
-interface ILoginState {
+interface IRegisterState {
   username: string;
+  email: string;
   password: string;
   showPassword: boolean;
-  usernameError: boolean;
+  usernameError;
+  emailError: boolean;
   passwordError: boolean;
   errorStatus: boolean;
   errorMessage: string;
 }
 
-export default function Login() {
-  const [state, setState] = useState<ILoginState>({
+export default function Register() {
+  const [state, setState] = useState<IRegisterState>({
     username: '',
+    email: '',
     password: '',
     showPassword: false,
     usernameError: false,
+    emailError: false,
     passwordError: false,
     errorStatus: false,
     errorMessage: '',
@@ -52,15 +56,6 @@ export default function Login() {
     setState({ ...state, showPassword: !state.showPassword });
   };
 
-  const handlePasswordChange = (e: any) => {
-    setState({
-      ...state,
-      password: e.target.value,
-      passwordError: false,
-      errorStatus: false,
-    });
-  };
-
   const handleUsernameChange = (e: any) => {
     setState({
       ...state,
@@ -70,9 +65,27 @@ export default function Login() {
     });
   };
 
-  const navigateToSignUp = () => {
+  const handlePasswordChange = (e: any) => {
+    setState({
+      ...state,
+      password: e.target.value,
+      passwordError: false,
+      errorStatus: false,
+    });
+  };
+
+  const handleEmailChange = (e: any) => {
+    setState({
+      ...state,
+      email: e.target.value,
+      emailError: false,
+      errorStatus: false,
+    });
+  };
+
+  const navigateToSignIn = () => {
     let path = new URLSearchParams(location.search);
-    const redirect = path.get('redirect') ? path.get('redirect') : '/register';
+    const redirect = path.get('redirect') ? path.get('redirect') : '/login';
     history.push(redirect!);
   };
 
@@ -90,17 +103,29 @@ export default function Login() {
   const validateForm = (e: any) => {
     e.preventDefault();
 
-    const usernameError = state.username.length > 0 ? false : true;
-    const passwordError = state.username.length > 0 ? false : true;
+    const usernameError = state.email.length > 0 ? false : true;
+    const emailError = state.email.length > 0 ? false : true;
+    const passwordError = state.email.length > 0 ? false : true;
 
     setState({
       ...state,
       usernameError: usernameError,
+      emailError: emailError,
       passwordError: passwordError,
     });
 
-    if (state.username.length > 0 && state.password.length > 0) {
-      login(state.username, state.password, handleSuccess, handleError);
+    if (
+      state.email.length > 0 &&
+      state.password.length > 0 &&
+      state.username.length > 0
+    ) {
+      register(
+        state.email,
+        state.password,
+        state.username,
+        handleSuccess,
+        handleError,
+      );
     }
   };
 
@@ -113,12 +138,12 @@ export default function Login() {
         </div>
       </div>
       <div className="right">
-        <div className="welcome-field">Sign in</div>
+        <div className="welcome-field">Register</div>
         <div className="welcome-underline" />
         <form className="form" onSubmit={validateForm}>
-          <LoginTextField
+          <RegisterTextField
             className="username"
-            placeholder="Username"
+            placeholder="username"
             variant="outlined"
             fullWidth
             error={state.usernameError}
@@ -134,7 +159,23 @@ export default function Login() {
             }}
             onChange={handleUsernameChange}
           />
-          <LoginTextField
+          <RegisterTextField
+            className="email"
+            placeholder="Email"
+            variant="outlined"
+            fullWidth
+            error={state.emailError}
+            helperText={state.emailError ? 'Please enter a valid email' : ''}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AccountCircle style={{ color: '#51247a' }} />
+                </InputAdornment>
+              ),
+            }}
+            onChange={handleEmailChange}
+          />
+          <RegisterTextField
             className="password"
             placeholder="Password"
             variant="outlined"
@@ -166,20 +207,20 @@ export default function Login() {
             onChange={handlePasswordChange}
           />
 
-          <LoginButton
+          <RegisterButton
             className="login-button"
             type="submit"
             variant="contained"
             fullWidth
           >
             Submit
-          </LoginButton>
+          </RegisterButton>
           <Typography
             variant="subtitle2"
             style={{ color: '#0000EE', margin: '12px 12px', cursor: 'pointer' }}
-            onClick={() => navigateToSignUp()}
+            onClick={() => navigateToSignIn()}
           >
-            Create an account
+            I already have an account
           </Typography>
         </form>
         <ToastContainer />
@@ -188,7 +229,7 @@ export default function Login() {
   );
 }
 
-const LoginTextField = withStyles({
+const RegisterTextField = withStyles({
   root: {
     '& .MuiOutlinedInput-root': {
       borderRadius: 100,
@@ -215,7 +256,7 @@ const LoginTextField = withStyles({
   },
 })(TextField);
 
-const LoginButton = withStyles({
+const RegisterButton = withStyles({
   root: {
     background:
       'linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);',

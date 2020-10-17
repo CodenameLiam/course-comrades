@@ -28,7 +28,7 @@ const Row = (props: RowComponentProps) => {
   const [liked, setLiked] = useState(false);
 
   const user = firebase.auth().currentUser;
-  const userName = user?.displayName;
+  const username = user?.displayName;
 
   const likePost = (username: string, noteId: string): void => {
     if (liked !== true) {
@@ -66,8 +66,8 @@ const Row = (props: RowComponentProps) => {
       </TableCell>
       <TableCell align="center">{likes || note.likes}</TableCell>
       <TableCell align="center">
-        <IconButton onClick={() => likePost(userName as string, note.id)}>
-          <ThumbUpIcon />
+        <IconButton onClick={() => likePost(username as string, note.id)}>
+          <ThumbUpIcon {...(liked ? { style: { fill: 'red' } } : {})} />
         </IconButton>
       </TableCell>
       <TableCell align="center">
