@@ -83,7 +83,7 @@ app.post('/api/create_note', async (req, res) => {
       hashtags: hashtags,
       faculty: faculty,
       semester: semester,
-      likes: 0,
+      likes: 1,
       downloads: 0,
       // need to use firebase timestamp date objects to filter by dates
       uploadDate: uploadDate,
@@ -101,10 +101,17 @@ app.post('/api/create_note', async (req, res) => {
 
     await course2NotesDB
       .doc(courseCode)
-      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
-    await course2NotesDB
-      .doc(courseCode)
-      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
+      .set(
+        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
+        { merge: true },
+      );
+
+    await noteLikesDB
+      .doc(note.id)
+      .set(
+        { users: [author] },
+      );
+
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -121,30 +128,33 @@ app.post('/api/like_note', async (req, res) => {
   try {
     const currentLikes = await getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
-    console.log('CLikes:', currentLikes);
+    const exists = (await noteLikesDB.doc(noteId).get());
+    if (!exists.data().users.includes(username)) {
+      // Updates likes
+      await noteRef.update({
+        likes: currentLikes + 1,
+      });
 
-    // Updates likes
-    await noteRef.update({
-      likes: currentLikes + 1,
-    });
+      // Adds note to userlikes and like to notelikes collections
 
-    // Adds note to userlikes and like to notelikes collections
+      await userLikesDB.doc(username).set(
+        {
+          users: admin.firestore.FieldValue.arrayUnion(noteId),
+        },
+        { merge: true },
+      );
 
-    await userLikesDB.doc(username).set(
-      {
-        notes: admin.firestore.FieldValue.arrayUnion(noteId),
-      },
-      { merge: true },
-    );
+      await noteLikesDB.doc(noteId).set(
+        {
+          users: admin.firestore.FieldValue.arrayUnion(username),
+        },
+        { merge: true },
+      );
+      res.status(200).send('successfully liked note');
+    } else {
+      res.status(400).send('user has already liked note or note does not exist');
+    }
 
-    await noteLikesDB.doc(username).set(
-      {
-        users: admin.firestore.FieldValue.arrayUnion(username),
-      },
-      { merge: true },
-    );
-
-    res.status(200).send('successfully liked note');
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -159,25 +169,30 @@ app.post('/api/unlike_note', async (req, res) => {
   // Get current likes
   try {
     const currentLikes = getCurrentLikes(req);
-    console.log('CLikes:', currentLikes);
     const noteRef = notesDB.doc(noteId);
+    const exists = (await noteLikesDB.doc(noteId).get());
+    console.log(noteRef.exists, exists.data().users.includes(username))
+    if (exists.data().users.includes(username)) {
+      // Updates likes
+      await noteRef.update({
+        likes: currentLikes - 1,
+      });
 
-    // Updates likes
-    await noteRef.update({
-      likes: currentLikes - 1,
-    });
+      // Remove note to userlikes and like to notelikes collections
 
-    // Remove note to userlikes and like to notelikes collections
+      await userLikesDB.doc(username).update({
+        users: admin.firestore.FieldValue.arrayRemove(noteId),
+      });
 
-    await userLikesDB.doc(username).update({
-      notes: admin.firestore.FieldValue.arrayRemove(noteId),
-    });
+      await noteLikesDB.doc(username).update({
+        users: admin.firestore.FieldValue.arrayRemove(username),
+      });
 
-    await noteLikesDB.doc(username).update({
-      users: admin.firestore.FieldValue.arrayRemove(username),
-    });
-
-    res.status(200).send('successfully liked note');
+      res.status(200).send('successfully liked note');
+    }
+    else {
+      res.status(400).send('')
+    }
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -254,7 +269,7 @@ app.get('/api/search', async (req, res) => {
 
 const getNotes = async (noteIds) => {
   const result = [];
-  noteIds.forEach(async function (noteId) {
+  noteIds.forEach(async function(noteId) {
     const docRef = await notesDB.doc(noteId).get();
     const noteData = docRef.data();
     result.push({
@@ -290,7 +305,8 @@ const hashtagQuery = async (hashtags) => {
       });
     });
     return noteIds;
-  } catch (e) {}
+  } catch (e) {
+  }
 };
 
 const courseCodeQuery = async (courseCode) => {
@@ -299,7 +315,8 @@ const courseCodeQuery = async (courseCode) => {
     const notes = docRef.data().notes;
     console.log('NOtes:');
     return notes;
-  } catch (e) {}
+  } catch (e) {
+  }
 };
 
 // Filter by semester, takes in array of notes, not id's
@@ -329,4 +346,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
-export default class server {}
+export default class server {
+}
