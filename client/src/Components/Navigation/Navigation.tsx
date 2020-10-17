@@ -8,17 +8,12 @@ import {
   makeStyles,
   Theme,
 } from "@material-ui/core";
-import {
-  ChromeReaderMode,
-  Eco,
-  Home,
-  Note,
-  NoteAdd,
-  Spa,
-} from "@material-ui/icons";
+import { ChromeReaderMode, Eco, ExitToApp, Home, Note, NoteAdd, Spa } from "@material-ui/icons";
 import clsx from "clsx";
 import React, { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { logout } from "../../Services/LoginService";
 
 interface INavigationState {
   navigationOpen: boolean;
@@ -33,6 +28,10 @@ export default function Navigation() {
     navigationOpen: true,
     navigationVisible: true,
   });
+
+  const handleLogOut = () => logout(handleLogOutSuccess, handleLogOutError);
+  const handleLogOutSuccess = () => history.push("/login");
+  const handleLogOutError = (e: any) => toast.error(e.message);
 
   const classes = useStyles();
   const navigationLinks = NavigationLinks();
@@ -96,7 +95,25 @@ export default function Navigation() {
             );
           })}
         </List>
+        <List classes={{ root: classes.listBottom }}>
+          <ListItem
+            button
+            onClick={handleLogOut}
+            classes={{ root: clsx(classes.menuButtom, classes.menuButtonExpand) }}
+          >
+            <ListItemIcon>
+              <ExitToApp />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItem>
+          {/* <ListItem button onClick={handleDrawer} classes={{ root: clsx(classes.menuButtom, classes.menuButtonExpand) }}>
+							<ListItemIcon>
+								<Menu />
+							</ListItemIcon>
+						</ListItem> */}
+        </List>
       </Drawer>
+      <ToastContainer />
     </div>
   );
 }
@@ -110,9 +127,10 @@ export interface LinkInterface {
 // Links for the navigation drawer
 function NavigationLinks(): LinkInterface[] {
   return [
-    { label: "Home", path: "/", icon: <Home /> },
+    { label: "Dashboard", path: "/", icon: <Home /> },
     { label: "My Notes", path: "/my-notes", icon: <Note /> },
-    { label: "Shared With Me", path: "/my-shares", icon: <NoteAdd /> },
+    { label: "Liked Notes", path: "/liked-notes", icon: <NoteAdd /> },
+    // { label: "Shared With Me", path: "/my-shares", icon: <NoteAdd /> },
     // { label: "Sustainability", path: "/sustainability", icon: <Eco /> },
     // { label: "Trading Post", path: "/trading-post", icon: <Store /> },
     // { label: "Quality", path: "/quality", icon: <Equalizer /> },
@@ -172,16 +190,15 @@ const useStyles = makeStyles((theme: Theme) =>
     drawerNotVisible: {
       width: "0rem",
     },
-    list: { margin: "0.5rem", height: "100%", overflow: "hidden" },
-    listBottom: { position: "absolute", bottom: "10px", width: "100%" },
+    list: { margin: "0.5rem 1rem", height: "100%", overflow: "hidden" },
+    listBottom: { margin: "0.5rem 1rem", position: "absolute", bottom: "10px", width: "90%" },
     menuButtom: {
       borderRadius: "1rem",
       marginBottom: "0.5rem",
       "& span": { fontFamily: "'Poppins', sans-serif" },
     },
     menuButtonActive: {
-      background:
-        "linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%)",
+      background: "linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%)",
       color: "white",
     },
     menuButtonInactive: {
