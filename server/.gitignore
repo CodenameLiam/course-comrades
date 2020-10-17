@@ -18,3 +18,4 @@ yarn-error.log*
 
 #key
 firebase-admin-token.json
+firebase-admin-token.js
