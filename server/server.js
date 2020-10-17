@@ -13,9 +13,6 @@ const app = express();
 const admin = require('firebase-admin');
 const serviceAccount = require('./firebase-admin-token.json');
 
-// Moment for handling dates
-const moment = require('moment');
-
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://uqcs-hackathon-2020.firebaseio.com',
@@ -31,7 +28,6 @@ app.use(express.static('../client/build'));
 app.use(express.json());
 
 const db = admin.firestore();
-const usersDB = db.collection('users');
 const notesDB = db.collection('notes');
 const userLikesDB = db.collection('user-likes');
 const noteLikesDB = db.collection('note-likes');
@@ -44,6 +40,7 @@ app.post('/api/create_note', async (req, res) => {
   const courseCode = req.body.courseCode;
   const description = req.body.description;
   const hashtags = req.body.hashtags;
+  const uploadDate = admin.firestore.Timestamp.fromDate(new Date());
   try {
     // .add() will generate a unique id in firestore
     const note = await notesDB.add({
@@ -54,17 +51,21 @@ app.post('/api/create_note', async (req, res) => {
       hashtags: hashtags,
       likes: 0,
       downloads: 0,
-      uploadDate: moment().format()
+      // need to use firebase timestamp date objects to filter by dates
+      uploadDate: uploadDate,
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    await notesDB.doc(note.id).update({id: note.id});
+    await notesDB.doc(note.id).update({ id: note.id });
 
-    hashtags.forEach(function (hashtag){
-      hashtagsDB.doc(hashtag).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true})
-    })
-
-
+    hashtags.forEach(function (hashtag) {
+      hashtagsDB
+        .doc(hashtag)
+        .set(
+          { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
+          { merge: true },
+        );
+    });
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -72,7 +73,6 @@ app.post('/api/create_note', async (req, res) => {
 
   res.status(200).send('succesfully created note');
 });
-
 
 // Handles likes a note
 app.post('/api/like_note', async (req, res) => {
@@ -91,93 +91,111 @@ app.post('/api/like_note', async (req, res) => {
     // Adds note to userlikes and like to notelikes collections
 
     await userLikesDB.doc(username).update({
-      notes: admin.firestore.FieldValue.arrayUnion(noteId)
-    })
+      notes: admin.firestore.FieldValue.arrayUnion(noteId),
+    });
 
     await noteLikesDB.doc(username).update({
-      users: admin.firestore.FieldValue.arrayUnion(username)
-    })
+      users: admin.firestore.FieldValue.arrayUnion(username),
+    });
 
     res.status(200).send('successfully liked note');
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
   }
-  });
+});
 
 // Handles unliking a note
-  app.post('/api/unlike_note', async (req, res) => {
-    const username = req.body.username;
-    const noteId = req.body.noteId;
-    // Get current likes
-    try {
-      const currentLikes = getCurrentLikes(req);
-      const noteRef = notesDB.doc(noteId);
+app.post('/api/unlike_note', async (req, res) => {
+  const username = req.body.username;
+  const noteId = req.body.noteId;
+  // Get current likes
+  try {
+    const currentLikes = getCurrentLikes(req);
+    const noteRef = notesDB.doc(noteId);
 
-      // Updates likes
-      await noteRef.update({
-        likes: currentLikes - 1,
-      });
+    // Updates likes
+    await noteRef.update({
+      likes: currentLikes - 1,
+    });
 
-      // Remove note to userlikes and like to notelikes collections
+    // Remove note to userlikes and like to notelikes collections
 
-      await userLikesDB.doc(username).update({
-        notes: admin.firestore.FieldValue.arrayRemove(noteId)
-      })
+    await userLikesDB.doc(username).update({
+      notes: admin.firestore.FieldValue.arrayRemove(noteId),
+    });
 
-      await noteLikesDB.doc(username).update({
-        users: admin.firestore.FieldValue.arrayRemove(username)
-      })
+    await noteLikesDB.doc(username).update({
+      users: admin.firestore.FieldValue.arrayRemove(username),
+    });
 
-      res.status(200).send('successfully liked note');
-    } catch (e) {
-      console.log(e);
-      res.status(500).send(e);
-    }
-
-  });
+    res.status(200).send('successfully liked note');
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e);
+  }
+});
 
 // Handles downloads counter incrementing
-  app.post('/api/add_download', async (req, res) => {
+app.post('/api/add_download', async (req, res) => {
+  const noteId = req.body.noteId;
+  try {
+    const docRef = notesDB.doc(noteId);
+    const currentDownloads = await docRef.data['downloads'];
 
-    const noteId = req.body.noteId;
-    try {
-      const docRef = notesDB.doc(noteId);
-      const currentDownloads = await docRef.data['downloads'];
+    // Updates downloads
+    await docRef.update({
+      downloads: currentDownloads + 1,
+    });
+    res.status(200).send('successfully added download');
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
 
-      // Updates downloads
-      await docRef.update({
-        downloads: currentDownloads + 1,
-      });
-      res.status(200).send('successfully added download');
-    } catch (e) {
-      res.status(500).send(e);
-    }
-  });
+// Query by likes and time
+app.get('/api/query/time/', async (req, res) => {
+  const fromDate = new Date();
+  fromDate.setHours(0, 0, 0, 0);
 
-// Query by hastag
-  app.get('/api/query/hashtag', async (req, res) =>{
-    try {
+  const timePeriod = req.query.timePeriod;
 
-    }
-    catch (e){
-      res.status(500).send(e);
-    }
-  })
-
-
-
-// Server content using react clientside
-  app.use((req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-  });
-
-  var getCurrentLikes = async (req) => {
-    const noteId = req.body.noteId;
-    // Get current likes
-    const currentLikes = await notesDB.doc(noteId).get().data['likes'];
+  switch (timePeriod) {
+    case 'day':
+      break;
+    case 'week':
+      fromDate.setDate(fromDate.getDate - 7);
+      break;
+    case 'month':
+      fromDate.setDate(fromDate.getDate - 31);
+      break;
+    case 'month':
+      fromDate.setDate(fromDate.getDate - 365);
+      break;
   }
 
+  const timestampDate = admin.firestore.Timestamp.fromDate(fromDate);
+  const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
+  res.status(200).send(snapshot.docs);
+});
 
+// Query by hastag
+app.get('/api/query/hashtag', async (req, res) => {
+  try {
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
 
-  app.listen(port, () => console.log(`Server started on port ${port}`));
+var getCurrentLikes = async (req) => {
+  const noteId = req.body.noteId;
+  // Get current likes
+  const currentLikes = await notesDB.doc(noteId).get().data['likes'];
+};
+
+// Server content using react clientside
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+
+app.listen(port, () => console.log(`Server started on port ${port}`));
