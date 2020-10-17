@@ -6,9 +6,6 @@ import express from 'express';
 // const fs = require("fs");
 // const util = require("util");
 import path from 'path';
-// Define application
-const app = express();
-
 // Lodash array utils
 import _ from 'lodash';
 
@@ -17,7 +14,8 @@ import admin from "firebase-admin";
 import serviceAccount from './firebase-admin-token.js';
 
 // Moment for handling dates
-import moment from "moment";
+// Define application
+const app = express();
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -80,11 +78,11 @@ app.post('/api/create_note', async (req, res) => {
 
     hashtags.forEach(function (hashtag) {
       console.log(hashtag);
-      hashtagsDB.doc(hashtag).set({notes: db.FieldValue.arrayUnion(note.id)}, {merge: true});
+      hashtagsDB.doc(hashtag).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true});
     });
 
-    await course2NotesDB.doc(courseCode).set({notes: db.FieldValue.arrayUnion(note.id)}, {merge: true});
-    await course2NotesDB.doc(courseCode).set({notes: db.FieldValue.arrayUnion(note.id)}, {merge: true});
+    await course2NotesDB.doc(courseCode).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true});
+    await course2NotesDB.doc(courseCode).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true});
 
   } catch (e) {
     console.log(e);
@@ -100,8 +98,9 @@ app.post('/api/like_note', async (req, res) => {
   const username = req.body.username;
   // Get current likes
   try {
-    const currentLikes = getCurrentLikes(req);
+    const currentLikes = await getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
+    console.log("CLikes:", currentLikes)
 
     // Updates likes
     await noteRef.update({
@@ -110,13 +109,13 @@ app.post('/api/like_note', async (req, res) => {
 
     // Adds note to userlikes and like to notelikes collections
 
-    await userLikesDB.doc(username).update({
-      notes: db.FieldValue.arrayUnion(noteId)
-    })
+    await userLikesDB.doc(username).set({
+      notes: admin.firestore.FieldValue.arrayUnion(noteId)
+    }, {merge: true})
 
-    await noteLikesDB.doc(username).update({
-      users: db.FieldValue.arrayUnion(username)
-    })
+    await noteLikesDB.doc(username).set({
+      users: admin.firestore.FieldValue.arrayUnion(username)
+    }, {merge: true})
 
     res.status(200).send('successfully liked note');
   } catch (e) {
@@ -129,9 +128,12 @@ app.post('/api/like_note', async (req, res) => {
 app.post('/api/unlike_note', async (req, res) => {
   const username = req.body.username;
   const noteId = req.body.noteId;
+
+
   // Get current likes
   try {
     const currentLikes = getCurrentLikes(req);
+    console.log("CLikes:", currentLikes);
     const noteRef = notesDB.doc(noteId);
 
     // Updates likes
@@ -142,11 +144,11 @@ app.post('/api/unlike_note', async (req, res) => {
     // Remove note to userlikes and like to notelikes collections
 
     await userLikesDB.doc(username).update({
-      notes: db.FieldValue.arrayRemove(noteId)
+      notes: admin.firestore.FieldValue.arrayRemove(noteId)
     })
 
     await noteLikesDB.doc(username).update({
-      users: db.FieldValue.arrayRemove(username)
+      users: admin.firestore.FieldValue.arrayRemove(username)
     })
 
     res.status(200).send('successfully liked note');
@@ -161,8 +163,8 @@ app.post('/api/unlike_note', async (req, res) => {
 app.post('/api/add_download', async (req, res) => {
   const noteId = req.body.noteId;
   try {
-    const docRef = notesDB.doc(noteId);
-    const currentDownloads = await docRef.data['downloads'];
+    const docRef = await notesDB.doc(noteId).get();
+    const currentDownloads = docRef.data().downloads;
 
     // Updates downloads
     await docRef.update({
@@ -231,19 +233,20 @@ app.get('/api/search', async (req, res) => {
 })
 
 const getNotes = async(noteIds) => {
-  var result = [];
-  noteIds.forEach( function (noteId){
-    const noteData = notesDB.doc(noteId).get().data();
+  const result = [];
+  noteIds.forEach( async function (noteId){
+    const docRef = await notesDB.doc(noteId).get();
+    const noteData = docRef.data();
     result.push(
         {
-          name: noteData['name'],
-          author: noteData['author'],
-          description: noteData['description'],
-          courseCode: noteData['courseCode'],
-          hashtags: noteData['hashtags'],
-          likes: noteData['likes'],
-          downloads: noteData['downloads'],
-          uploadDate: noteData['uploadDate'],
+          name: noteData.name,
+          author: noteData.author,
+          description: noteData.description,
+          courseCode: noteData.courseCode,
+          hashtags: noteData.hashtags,
+          likes: noteData.likes,
+          downloads: noteData.downloads,
+          uploadDate: noteData.uploadDate,
           noteId : noteId
         }
     );
@@ -254,8 +257,8 @@ const getNotes = async(noteIds) => {
 
 const getCurrentLikes = async (req) => {
   const noteId = req.body.noteId;
-  // Get current likes
-  return  await notesDB.doc(noteId).get().data['likes'];
+  const docRef = await notesDB.doc(noteId).get();
+  return await docRef.data().likes;
 }
 
 // Query by hashtag
@@ -263,7 +266,8 @@ const hashtagQuery =  async (hashtags) => {
   try {
     var noteIds = [];
     hashtags.forEach((hashtag) => {
-      const notes = (hashtagsDB.doc(hashtag).get()).data()['notes']
+      const docRef = hashtagsDB.doc(hashtag).get();
+      const notes = docRef.data().notes;
       notes.forEach((noteID) => {
         noteIds.push(noteID);
       })
@@ -276,9 +280,10 @@ const hashtagQuery =  async (hashtags) => {
 
 const courseCodeQuery = async (courseCode) => {
   try {
-    const notes = await course2NotesDB.doc(courseCode).get().data()['notes'];
+    const docRef = await course2NotesDB.doc(courseCode).get();
+    const notes = docRef.data().notes;
     console.log("NOtes:");
-    return await course2NotesDB.doc(courseCode).get().data()['notes'];
+    return notes;
   }
   catch (e){
   }
@@ -311,3 +316,5 @@ app.use((req, res) => {
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
+export default class server {
+}
