@@ -68,23 +68,19 @@ app.post('/create_note', async (req, res) => {
 
 // Handles upvoting a note
 app.post('/like_note', async (req, res) => {
-  const fileLink = req.body.fileLink;
+  const noteId = req.body.noteId;
   const username = req.body.username;
 
   // Get current likes
-  const currentLikes = await notesDB.doc(fileLink).get().data['likes'];
-  const docRef = notesDB.doc(fileLink);
+  const currentLikes = await notesDB.doc(noteId).get().data['likes'];
+  const noteRef = notesDB.doc(noteId);
 
   // Updates likes
-  await docRef.update({
+  await noteRef.update({
     likes: currentLikes + 1,
   });
-  if (!currentLikes.exists) {
-    console.log('No such document!');
-  } else {
-    console.log('Document data:', currentLikes.data());
-    console.log(x);
-  }
+
+  res.status(200).send('succesfully liked note');
 });
 
 // Handles downloads counter incrementing
