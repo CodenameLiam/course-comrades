@@ -266,7 +266,7 @@ app.post('/api/query/time/', async (req, res) => {
   res.status(200).send(sortedNotesArray);
 });
 
-app.post('api/get-liked-notes', async (req, res) => {
+app.post('/api/get-liked-notes', async (req, res) => {
   const username = req.body.username;
   if (username === undefined) {
     res.status(400).send('Bad Request');
@@ -275,14 +275,13 @@ app.post('api/get-liked-notes', async (req, res) => {
     const docRef = userLikesDB.doc(username).get();
     if ((await docRef).exists) {
       const results = await getNotes((await docRef).data().notes);
-      res.status(200).send();
+      res.status(200).send(results);
     } else {
       res.status(400).send('Bad Request');
     }
   } catch (e) {
     res.status(500).send(e);
   }
-  const docRef = await userLikesDB.doc(username).get();
 });
 
 app.get('/api/search', async (req, res) => {
