@@ -3,17 +3,19 @@ import Header from "./Header";
 import Navigation from "./Navigation";
 
 interface IPageProps {
-  children: any;
+	children: any;
+	request?: () => void;
 }
 
 export default function Page(props: IPageProps) {
-  return (
-    <div className="page">
-      <Header />
-      <div className="content">
-        <Navigation />
-        <div className="body">{props.children}</div>
-      </div>
-    </div>
-  );
+	const request = props.request ? props.request : () => {};
+	return (
+		<div className="page">
+			<Header request={request} />
+			<div className="content">
+				<Navigation />
+				<div className="body">{props.children}</div>
+			</div>
+		</div>
+	);
 }

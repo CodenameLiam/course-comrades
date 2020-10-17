@@ -1,40 +1,24 @@
 .page {
-  height: calc(100vh - 5rem);
-  width: 100%;
+	height: calc(100vh - 5rem);
+	width: 100%;
 
-  .header {
-    height: 5rem;
-    background-color: $colour-primary;
-    background-color: $colour-primary-gradient;
-    color: #ffffff;
-    display: flex;
-    z-index: 20;
-    position: relative;
-    justify-content: space-between;
-    .title {
-      font-size: 2rem;
-      margin: auto 0rem;
-      margin-left: 4rem;
-    }
-  }
+	.content {
+		display: flex;
+		height: 100%;
+		position: relative;
 
-  .content {
-    display: flex;
-    height: 100%;
-    position: relative;
+		.navigation {
+			height: 100%;
+			background: $grey-0;
+			z-index: 5;
+		}
 
-    .navigation {
-      height: 100%;
-      background: $grey-0;
-      z-index: 5;
-    }
-
-    .body {
-      width: 100%;
-    }
-  }
+		.body {
+			width: 100%;
+		}
+	}
 }
 
 .MuiButton-textPrimary {
-  color: white !important;
+	color: white !important;
 }

@@ -1,0 +1,36 @@
+.header {
+	height: 5rem;
+	background-color: $colour-primary;
+	background-color: $colour-primary-gradient;
+	color: #ffffff;
+	display: flex;
+	z-index: 20;
+	position: relative;
+	justify-content: space-between;
+
+	.left {
+		display: flex;
+		.title {
+			font-size: 2rem;
+			margin: auto 0rem;
+			margin-left: 2rem;
+		}
+	}
+
+	.right {
+		display: flex;
+		margin-right: 2rem;
+		.MuiFormControl-root {
+			height: 100%;
+
+			.MuiInputBase-root {
+				margin: auto;
+			}
+		}
+
+		.upload {
+			width: 15rem;
+			margin-left: 2rem;
+		}
+	}
+}
