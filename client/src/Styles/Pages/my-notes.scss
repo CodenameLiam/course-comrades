@@ -1,0 +1,22 @@
+.my-notes {
+  padding: 4rem;
+
+  .title {
+    color: $colour-primary;
+    font-size: 1.5rem;
+  }
+
+  .input {
+    display: flex;
+
+    .search-notes {
+      width: 100%;
+      max-width: 30rem;
+      margin: 2rem 0rem;
+    }
+
+    .upload-notes {
+      margin: 2rem;
+    }
+  }
+}

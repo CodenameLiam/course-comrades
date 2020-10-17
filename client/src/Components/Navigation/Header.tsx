@@ -1,5 +1,9 @@
 import React from "react";
 
+// interface IHeaderProps{
+//   closeNav: ()=>void;
+// }
+
 export default function Header() {
   return (
     <div className="header">

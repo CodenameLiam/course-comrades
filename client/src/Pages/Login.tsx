@@ -1,20 +1,9 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  withStyles,
-  InputAdornment,
-  IconButton,
-} from "@material-ui/core";
-import {
-  AccountCircle,
-  Lock,
-  Visibility,
-  VisibilityOff,
-} from "@material-ui/icons";
+import { TextField, Button, withStyles, InputAdornment, IconButton } from "@material-ui/core";
+import { AccountCircle, Lock, Visibility, VisibilityOff } from "@material-ui/icons";
 import { login } from "../Services/LoginService";
 import { ToastContainer, toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 interface ILoginState {
   username: string;
@@ -38,6 +27,7 @@ export default function Login() {
   });
 
   const history = useHistory();
+  const location = useLocation();
 
   // Prevents default behaviour when hiding/showing password
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -68,7 +58,9 @@ export default function Login() {
   };
 
   const handleSuccess = () => {
-    history.push("/");
+    let path = new URLSearchParams(location.search);
+    const redirect = path.get("redirect") ? path.get("redirect") : "/";
+    history.push(redirect!);
   };
 
   const handleError = (e: any) => {
@@ -106,9 +98,7 @@ export default function Login() {
             variant="outlined"
             fullWidth
             error={state.usernameError}
-            helperText={
-              state.usernameError ? "Please enter a valid username" : ""
-            }
+            helperText={state.usernameError ? "Please enter a valid username" : ""}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -124,9 +114,7 @@ export default function Login() {
             variant="outlined"
             fullWidth
             error={state.passwordError}
-            helperText={
-              state.passwordError ? "Please enter a valid password" : ""
-            }
+            helperText={state.passwordError ? "Please enter a valid password" : ""}
             type={state.showPassword ? "text" : "password"}
             value={state.password}
             InputProps={{
@@ -150,12 +138,7 @@ export default function Login() {
             onChange={handlePasswordChange}
           />
 
-          <LoginButton
-            className="login-button"
-            type="submit"
-            variant="contained"
-            fullWidth
-          >
+          <LoginButton className="login-button" type="submit" variant="contained" fullWidth>
             Login
           </LoginButton>
         </form>
@@ -194,8 +177,7 @@ const LoginTextField = withStyles({
 
 const LoginButton = withStyles({
   root: {
-    background:
-      "linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);",
+    background: "linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);",
     borderRadius: 100,
     height: "48px",
     marginTop: "1rem",
