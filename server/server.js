@@ -176,7 +176,9 @@ app.get('/api/query/time/', async (req, res) => {
 
   const timestampDate = admin.firestore.Timestamp.fromDate(fromDate);
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
-  res.status(200).send(snapshot.docs);
+  const notesArray = snapshot.docs.map((doc) => doc.data());
+
+  res.status(200).send(notesArray);
 });
 
 // Query by hastag
