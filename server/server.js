@@ -9,6 +9,10 @@ import path from 'path';
 // Lodash array utils
 import _ from 'lodash';
 
+// Load SwaggerUI
+
+import swaggerUI from 'swagger-ui-express';
+import swaggerDocument from './swagger.js';
 // Use your firebase private key here. Initialize our firebase account, as well as our firestore databases.
 import admin from 'firebase-admin';
 import serviceAccount from './firebase-admin-token.js';
@@ -25,13 +29,12 @@ admin.initializeApp({
 });
 
 export const db = admin.firestore();
-const userSavedDB = db.collection('user-saved');
+const userUploadDB = db.collection('user-upload');
 const notesDB = db.collection('notes');
 const userLikesDB = db.collection('user-likes');
 const noteLikesDB = db.collection('note-likes');
 const hashtagsDB = db.collection('hashtags-notes');
 const course2NotesDB = db.collection('course-notes');
-const notes2facultyDB = db.collection('note-faculty');
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -117,6 +120,10 @@ app.post('/api/create-note', async (req, res) => {
     await noteLikesDB.doc(note.id).set({ users: [author] });
 
     await userLikesDB
+      .doc(author)
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
+
+    await userUploadDB
       .doc(author)
       .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
   } catch (e) {
@@ -228,19 +235,11 @@ app.post('/api/add-download', async (req, res) => {
   }
 });
 
-// // Add a saved note for a user
-// app.post('api/save-note', async (req, res) => {
-//   try {
-//
-//   } catch (e) {
-//
-//   }
-// })
-
 // Query by likes and time
 app.post('/api/query/time/', async (req, res) => {
   const timePeriod = req.query.timePeriod;
   const numResults = parseInt(req.query.numResults) || 100;
+  const username = req.body.username;
 
   const fromDate = new Date();
   fromDate.setHours(0, 0, 0, 0);
@@ -262,6 +261,14 @@ app.post('/api/query/time/', async (req, res) => {
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
   const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(-Math.abs(numResults));
+  for (const note of sortedNotesArray) {
+    const refDoc = await userLikesDB.doc(username).get();
+    if (refDoc.exists && refDoc.data().notes.includes(note.id)) {
+      note.liked = true;
+    } else {
+      note.liked = false;
+    }
+  }
 
   res.status(200).send(sortedNotesArray);
 });
@@ -274,8 +281,8 @@ app.post('/api/get-liked-notes', async (req, res) => {
   try {
     const docRef = userLikesDB.doc(username).get();
     if ((await docRef).exists) {
-      const results = await getNotes((await docRef).data().notes);
-      res.status(200).send(results);
+      const results = await getNotes((await docRef).data().notes, true);
+      res.status(200).send();
     } else {
       res.status(400).send('Bad Request');
     }
@@ -291,6 +298,8 @@ app.get('/api/search', async (req, res) => {
     const hashtags = req.body.hashtags;
     const semester = req.body.semester;
     const courseCode = req.body.courseCode;
+    const username = req.body.username;
+
     console.log(faculty, hashtags, semester, courseCode);
 
     const temp = await courseCodeQuery(courseCode);
@@ -301,7 +310,7 @@ app.get('/api/search', async (req, res) => {
       resultId = Array.from(new Set(resultId.concat(await hashtagQuery(hashtags))));
     }
 
-    let notes = await getNotes(resultId);
+    let notes = await getNotes(resultId, username);
 
     notes = notes.filter((note) => {
       let valid = true;
@@ -322,10 +331,39 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-const getNotes = async (noteIds) => {
+// Get uploaded notes by a user
+app.use('/api/get-uploaded', async (req, res) => {
+  const username = req.body.username;
+  if (!username) {
+    res.status(400).send('Bad request, undefined username');
+  }
+  try {
+    const docRef = await userUploadDB.doc(username).get();
+    if (!docRef.exists) {
+      res.status(200).send('[]');
+    }
+    res.status(200).send(getNotes(docRef.data().notes));
+  } catch (e) {}
+});
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+// Below are all the helper functions used
+
+// Returns an array of note JSON objects from an array of note ID's
+const getNotes = async (noteIds, username) => {
   const result = [];
+  let likeFlag = false;
   for (const noteId of noteIds) {
     const docRef = await notesDB.doc(noteId).get();
+    const likeRef = await userLikesDB.doc(username).get();
+    if (username === true) {
+      likeFlag = true;
+    } else {
+      if (likeRef.exists) {
+        likeRef.data().notes.includes(noteId);
+        likeFlag = true;
+      }
+    }
     const noteData = docRef.data();
     result.push({
       name: noteData.name,
@@ -339,6 +377,7 @@ const getNotes = async (noteIds) => {
       noteId: noteId,
       faculty: noteData.faculty,
       semester: noteData.semester,
+      liked: likeFlag,
     });
   }
   return result;
