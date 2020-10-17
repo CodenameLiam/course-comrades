@@ -1,0 +1,31 @@
+.page {
+  height: calc(100vh - 5rem);
+  width: 100%;
+
+  .header {
+    height: 5rem;
+    background-color: $colour-primary;
+    background-color: $colour-primary-gradient;
+    color: #ffffff;
+    display: flex;
+    z-index: 20;
+    position: relative;
+    .title {
+      font-size: 2rem;
+      margin: auto 0rem;
+      margin-left: 4rem;
+    }
+  }
+
+  .content {
+    display: flex;
+    height: 100%;
+    position: relative;
+
+    .navigation {
+      width: 20rem;
+      height: 100%;
+      background: $grey-1;
+    }
+  }
+}
