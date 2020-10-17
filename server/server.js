@@ -341,11 +341,11 @@ app.post('/api/get-uploaded', async (req, res) => {
   try {
     const docRef = await userUploadDB.doc(username).get();
     if (!docRef.exists) {
-      res.status(200).send('[]');
+      res.status(200).send([]);
     }
-    res.status(200).send(getNotes(docRef.data().notes, username));
-  } catch (e) {
-  }
+    const userNotes = await getNotes(docRef.data().notes, username);
+    res.status(200).send(userNotes);
+  } catch (e) {}
 });
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
@@ -383,7 +383,6 @@ const getNotes = async (noteIds, username) => {
     if (!!username) {
       likeFlag = true;
     } else {
-
     }
   }
   return result;
@@ -433,14 +432,11 @@ const courseCodeQuery = async (courseCode) => {
 
 // Server content using react clientside
 app.get('/', (req, res) => {
-  try{
+  try {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-  }
-  catch (e){
+  } catch (e) {
     console.log(e);
-    
   }
-
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
