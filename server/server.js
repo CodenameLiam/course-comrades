@@ -271,6 +271,7 @@ app.post('/api/query/time/', async (req, res) => {
   const notesArray = snapshot.docs.map((doc) => doc.data());
   const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(-Math.abs(numResults));
   for (const note of sortedNotesArray){
+    console.log(username);
     const refDoc = await userLikesDB.doc(username).get();
     if (refDoc.exists && refDoc.data().notes.includes(note.id)){
       note.liked = true;
@@ -289,10 +290,10 @@ app.post('api/get-liked-notes', async (req, res) => {
     res.status(400).send('Bad Request');
   }
   try {
-    const docRef = userLikesDB.doc(username).get();
-    if ((await docRef).exists) {
+    const docRef = await userLikesDB.doc(username).get();
+    if (docRef.exists) {
       const results = await getNotes((await docRef).data().notes, true);
-      res.status(200).send();
+      res.status(200).send(results);
     } else {
       res.status(400).send('Bad Request');
     }
