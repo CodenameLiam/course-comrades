@@ -333,7 +333,7 @@ app.get('/api/search', async (req, res) => {
 });
 
 // Get uploaded notes by a user
-app.use('/api/get-uploaded', async (req, res) => {
+app.post('/api/get-uploaded', async (req, res) => {
   const username = req.body.username;
   if (!username) {
     res.status(400).send('Bad request, undefined username');
@@ -343,8 +343,9 @@ app.use('/api/get-uploaded', async (req, res) => {
     if (!docRef.exists) {
       res.status(200).send('[]');
     }
-    res.status(200).send(getNotes(docRef.data().notes));
-  } catch (e) {}
+    res.status(200).send(getNotes(docRef.data().notes, username));
+  } catch (e) {
+  }
 });
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
@@ -356,30 +357,34 @@ const getNotes = async (noteIds, username) => {
   let likeFlag = false;
   for (const noteId of noteIds) {
     const docRef = await notesDB.doc(noteId).get();
-    if (!!username) {
-      likeFlag = true;
-    } else {
+    if (docRef.exists) {
       const likeRef = await userLikesDB.doc(username).get();
       if (likeRef.exists) {
         likeRef.data().notes.includes(noteId);
         likeFlag = true;
       }
+
+      const noteData = docRef.data();
+      result.push({
+        name: noteData.name,
+        author: noteData.author,
+        description: noteData.description,
+        courseCode: noteData.courseCode,
+        hashtags: noteData.hashtags,
+        likes: noteData.likes,
+        downloads: noteData.downloads,
+        uploadDate: noteData.uploadDate,
+        noteId: noteId,
+        faculty: noteData.faculty,
+        semester: noteData.semester,
+        liked: likeFlag,
+      });
     }
-    const noteData = docRef.data();
-    result.push({
-      name: noteData.name,
-      author: noteData.author,
-      description: noteData.description,
-      courseCode: noteData.courseCode,
-      hashtags: noteData.hashtags,
-      likes: noteData.likes,
-      downloads: noteData.downloads,
-      uploadDate: noteData.uploadDate,
-      noteId: noteId,
-      faculty: noteData.faculty,
-      semester: noteData.semester,
-      liked: likeFlag,
-    });
+    if (!!username) {
+      likeFlag = true;
+    } else {
+
+    }
   }
   return result;
 };
@@ -428,7 +433,14 @@ const courseCodeQuery = async (courseCode) => {
 
 // Server content using react clientside
 app.get('/', (req, res) => {
-  if (req.accept('html')) secres.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  try{
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  }
+  catch (e){
+    console.log(e);
+    
+  }
+
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

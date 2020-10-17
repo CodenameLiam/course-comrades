@@ -20,4 +20,4 @@ yarn-error.log*
 /build
 
 # Firebase config
-FirebaseConfig.ts
+src/FirebaseConfig.ts
