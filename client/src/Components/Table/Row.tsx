@@ -1,14 +1,5 @@
-import {
-  Paper,
-  Table,
-  TableContainer,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableHead,
-} from '@material-ui/core';
+import { TableRow, TableCell } from '@material-ui/core';
 import * as firebase from 'firebase/app';
-
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Note from '../../Types/Note';
@@ -18,11 +9,10 @@ import IconButton from '@material-ui/core/IconButton';
 
 type RowComponentProps = {
   note: Note;
-  index: number;
 };
 
 const Row = (props: RowComponentProps) => {
-  const { note, index } = props;
+  const { note } = props;
 
   const [likes, setLikes] = useState<number | undefined>(undefined);
   const [liked, setLiked] = useState(false);
@@ -32,7 +22,7 @@ const Row = (props: RowComponentProps) => {
 
   const likePost = (username: string, noteId: string): void => {
     if (liked !== true) {
-      fetch('/api/like_note', {
+      fetch('/api/like-note', {
         method: 'POST',
         body: JSON.stringify({
           username: username,
@@ -42,8 +32,8 @@ const Row = (props: RowComponentProps) => {
           'Content-Type': 'application/json',
         },
       })
-        .then((res) => res.json())
         .then(() => {
+          console.log('hello');
           setLikes(note.likes + 1);
           setLiked(true);
         })
@@ -51,10 +41,8 @@ const Row = (props: RowComponentProps) => {
     }
   };
 
-  console.log(note);
-
   return (
-    <TableRow key={index}>
+    <TableRow key={note.id}>
       <TableCell component="th" scope="row">
         {note.name}
       </TableCell>
@@ -67,7 +55,7 @@ const Row = (props: RowComponentProps) => {
       <TableCell align="center">{likes || note.likes}</TableCell>
       <TableCell align="center">
         <IconButton onClick={() => likePost(username as string, note.id)}>
-          <ThumbUpIcon {...(liked ? { style: { fill: 'red' } } : {})} />
+          <ThumbUpIcon {...(liked ? { style: { fill: 'green' } } : {})} />
         </IconButton>
       </TableCell>
       <TableCell align="center">

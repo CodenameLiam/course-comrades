@@ -121,18 +121,11 @@ app.post('/api/create-note', async (req, res) => {
 
     await userLikesDB
       .doc(author)
-      .set(
-        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-        { merge: true },
-      );
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
 
     await userUploadDB
       .doc(author)
-      .set(
-        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-        { merge: true },
-      );
-
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -242,8 +235,6 @@ app.post('/api/add-download', async (req, res) => {
   }
 });
 
-
-
 // Query by likes and time
 app.post('/api/query/time/', async (req, res) => {
   const timePeriod = req.query.timePeriod;
@@ -270,13 +261,11 @@ app.post('/api/query/time/', async (req, res) => {
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
   const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(-Math.abs(numResults));
-  for (const note of sortedNotesArray){
-    console.log(username);
+  for (const note of sortedNotesArray) {
     const refDoc = await userLikesDB.doc(username).get();
-    if (refDoc.exists && refDoc.data().notes.includes(note.id)){
+    if (refDoc.exists && refDoc.data().notes.includes(note.id)) {
       note.liked = true;
-    }
-    else {
+    } else {
       note.liked = false;
     }
   }
@@ -284,7 +273,7 @@ app.post('/api/query/time/', async (req, res) => {
   res.status(200).send(sortedNotesArray);
 });
 
-app.post('api/get-liked-notes', async (req, res) => {
+app.post('/api/get-liked-notes', async (req, res) => {
   const username = req.body.username;
   if (username === undefined) {
     res.status(400).send('Bad Request');
@@ -300,7 +289,6 @@ app.post('api/get-liked-notes', async (req, res) => {
   } catch (e) {
     res.status(500).send(e);
   }
-
 });
 
 app.get('/api/search', async (req, res) => {
@@ -344,21 +332,19 @@ app.get('/api/search', async (req, res) => {
 });
 
 // Get uploaded notes by a user
-app.use('/api/get-uploaded',async (req, res) =>{
+app.use('/api/get-uploaded', async (req, res) => {
   const username = req.body.username;
-  if (!username){
+  if (!username) {
     res.status(400).send('Bad request, undefined username');
   }
-  try{
+  try {
     const docRef = await userUploadDB.doc(username).get();
-    if (!docRef.exists){
+    if (!docRef.exists) {
       res.status(200).send('[]');
     }
-    res.status(200).send(getNotes(docRef.data().notes))
-  }
-  catch (e){
-  }
-})
+    res.status(200).send(getNotes(docRef.data().notes));
+  } catch (e) {}
+});
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 // Below are all the helper functions used
@@ -370,12 +356,11 @@ const getNotes = async (noteIds, username) => {
   for (const noteId of noteIds) {
     const docRef = await notesDB.doc(noteId).get();
     const likeRef = await userLikesDB.doc(username).get();
-    if (username === true){
+    if (username === true) {
       likeFlag = true;
-    }
-    else {
-      if (likeRef.exists){
-        likeRef.data().notes.includes(noteId)
+    } else {
+      if (likeRef.exists) {
+        likeRef.data().notes.includes(noteId);
         likeFlag = true;
       }
     }
@@ -392,13 +377,11 @@ const getNotes = async (noteIds, username) => {
       noteId: noteId,
       faculty: noteData.faculty,
       semester: noteData.semester,
-      liked: likeFlag
+      liked: likeFlag,
     });
   }
   return result;
 };
-
-
 
 const getCurrentLikes = async (req) => {
   const noteId = req.body.noteId;
