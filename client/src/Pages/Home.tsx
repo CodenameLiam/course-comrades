@@ -1,29 +1,15 @@
 import {
-  Button,
   IconButton,
   InputAdornment,
-  InputBase,
-  makeStyles,
-  Paper,
-  Table,
-  TableContainer,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableHead,
   TextField,
   withStyles,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { logout } from '../Services/LoginService';
-import { ToastContainer, toast } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
 import Page from '../Components/Navigation/Page';
 import { Search } from '@material-ui/icons';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Note from '../Types/Note';
-import moment from 'moment';
+import TableComponent from '../Components/Table/Table';
 
 export default function Home() {
   const history = useHistory();
@@ -76,44 +62,7 @@ export default function Home() {
         </div>
         <div className="top-notes">
           <p>Top Notes</p>
-          <TableContainer component={Paper}>
-            <Table className="table" aria-label="top notes">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="center">Course Code</TableCell>
-                  <TableCell align="center">Date Uploaded</TableCell>
-                  <TableCell align="center">Likes</TableCell>
-                  <TableCell align="center">{''}</TableCell>
-                  <TableCell align="center">{''}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {topNotes.map((note: Note, index) => {
-                  return (
-                    <TableRow key={note.id}>
-                      <TableCell component="th" scope="row">
-                        {note.name}
-                      </TableCell>
-                      <TableCell align="center">{note.courseCode}</TableCell>
-                      <TableCell align="center">
-                        {moment(
-                          new Date(parseInt(note.uploadDate._seconds) * 1000),
-                        ).format('DD/MM/YYYY, HH:mm')}
-                      </TableCell>
-                      <TableCell align="center">{note.likes}</TableCell>
-                      <TableCell align="center">
-                        <ThumbUpIcon />
-                      </TableCell>
-                      <TableCell align="center">
-                        <CloudDownloadIcon />
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <TableComponent notes={topNotes} />
         </div>
       </div>
     </Page>
