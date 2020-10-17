@@ -13,27 +13,37 @@ import {
   TableHead,
   TextField,
   withStyles,
-} from "@material-ui/core";
-import React from "react";
-import { logout } from "../Services/LoginService";
-import { ToastContainer, toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
-import Page from "../Components/Navigation/Page";
-import { Search } from "@material-ui/icons";
+} from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { logout } from '../Services/LoginService';
+import { ToastContainer, toast } from 'react-toastify';
+import { useHistory } from 'react-router-dom';
+import Page from '../Components/Navigation/Page';
+import { Search } from '@material-ui/icons';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import Note from '../Types/Note';
+import moment from 'moment';
 
 export default function Home() {
   const history = useHistory();
+  const [topNotes, setTopNotes] = useState<Note[]>([]);
 
-  const handleSuccess = () => {
-    history.push("/login");
-    console.log("success");
-    toast.success("YEET");
-  };
-
-  const handleError = (e: any) => {
-    toast.error(e.message);
-    console.log(e);
-  };
+  useEffect(() => {
+    fetch('/api/query/time', {
+      method: 'POST',
+      body: JSON.stringify({
+        timePeriod: 'week',
+        numResults: 10,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data: Note[]) => setTopNotes(data))
+      .catch((e) => console.log(e));
+  }, []);
 
   return (
     <Page>
@@ -53,7 +63,7 @@ export default function Home() {
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="search"
-                    style={{ color: "#ffffff" }}
+                    style={{ color: '#ffffff' }}
                     // onClick={handleClickShowPassword}
                     // onMouseDown={handleMouseDownPassword}
                   >
@@ -74,22 +84,33 @@ export default function Home() {
                   <TableCell align="center">Course Code</TableCell>
                   <TableCell align="center">Date Uploaded</TableCell>
                   <TableCell align="center">Likes</TableCell>
+                  <TableCell align="center">{''}</TableCell>
+                  <TableCell align="center">{''}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* {state.map((user, index) => {
+                {topNotes.map((note: Note, index) => {
                   return (
-                    <TableRow key={user.id}>
+                    <TableRow key={note.id}>
                       <TableCell component="th" scope="row">
-                        {index}
+                        {note.name}
                       </TableCell>
-                      <TableCell align="center">{user.email}</TableCell>
-                      <TableCell align="center">{user.firstName}</TableCell>
-                      <TableCell align="center">{user.lastName}</TableCell>
-                      <TableCell align="center">{getGroups(user.groups)}</TableCell>
+                      <TableCell align="center">{note.courseCode}</TableCell>
+                      <TableCell align="center">
+                        {moment(
+                          new Date(parseInt(note.uploadDate._seconds) * 1000),
+                        ).format('DD/MM/YYYY, HH:mm')}
+                      </TableCell>
+                      <TableCell align="center">{note.likes}</TableCell>
+                      <TableCell align="center">
+                        <ThumbUpIcon />
+                      </TableCell>
+                      <TableCell align="center">
+                        <CloudDownloadIcon />
+                      </TableCell>
                     </TableRow>
                   );
-                })} */}
+                })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -105,31 +126,31 @@ export default function Home() {
 
 export const SearchTextField = withStyles({
   root: {
-    "& .MuiOutlinedInput-root": {
+    '& .MuiOutlinedInput-root': {
       borderRadius: 100,
-      boxShadow: "2px 2px 5px #dddddd",
-      background: "#51247a",
-      "& input": {
-        background: "#ffffff",
-        borderRadius: "100rem 0rem 0rem 100rem",
+      boxShadow: '2px 2px 5px #dddddd',
+      background: '#51247a',
+      '& input': {
+        background: '#ffffff',
+        borderRadius: '100rem 0rem 0rem 100rem',
       },
-      "& fieldset": {
-        transition: "box-shadow 0.3s",
-        borderColor: "#dddddd",
+      '& fieldset': {
+        transition: 'box-shadow 0.3s',
+        borderColor: '#dddddd',
       },
-      "&:hover fieldset": {
-        borderColor: "#dddddd",
-        boxShadow: "2px 2px 10px #dddddd",
+      '&:hover fieldset': {
+        borderColor: '#dddddd',
+        boxShadow: '2px 2px 10px #dddddd',
       },
-      "&.Mui-focused fieldset": {
-        borderColor: "#dddddd",
-        boxShadow: "2px 2px 10px #dddddd",
+      '&.Mui-focused fieldset': {
+        borderColor: '#dddddd',
+        boxShadow: '2px 2px 10px #dddddd',
       },
     },
-    "& .Mui-error": {
-      "& fieldset": {
-        transition: "box-shadow 0.3s",
-        borderColor: "#e62645",
+    '& .Mui-error': {
+      '& fieldset': {
+        transition: 'box-shadow 0.3s',
+        borderColor: '#e62645',
       },
     },
   },

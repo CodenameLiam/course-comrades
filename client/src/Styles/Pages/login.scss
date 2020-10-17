@@ -6,6 +6,21 @@
     background: $colour-primary;
     background: $colour-primary-gradient;
     width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+
+      .login-logo {
+        height: 200px;
+        filter: brightness(0) invert(1);
+      }
+    }
   }
 
   .right {

@@ -17,6 +17,8 @@ import serviceAccount from './firebase-admin-token.js';
 // Define application
 const app = express();
 
+import cors from 'cors';
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://uqcs-hackathon-2020.firebaseio.com',
@@ -31,14 +33,25 @@ const hashtagsDB = db.collection('hashtags-notes');
 const course2NotesDB = db.collection('course-notes');
 const notes2facultyDB = db.collection('note-faculty');
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 // Define port
 const port = 5000;
 
+const router = express.Router();
+
 // Serve static assets built from the clientside
-app.use(express.static('../client/build'));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // middleware to handle requests with json body
 app.use(express.json());
+
+// allow requests from frontend in dev
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+  }),
+);
 
 // Handles Creating notes
 app.post('/api/create_note', async (req, res) => {
@@ -83,24 +96,15 @@ app.post('/api/create_note', async (req, res) => {
       console.log(hashtag);
       hashtagsDB
         .doc(hashtag)
-        .set(
-          { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-          { merge: true },
-        );
+        .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
     });
 
     await course2NotesDB
       .doc(courseCode)
-      .set(
-        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-        { merge: true },
-      );
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
     await course2NotesDB
       .doc(courseCode)
-      .set(
-        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
-        { merge: true },
-      );
+      .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -207,7 +211,7 @@ app.post('/api/add_download', async (req, res) => {
 // })
 
 // Query by likes and time
-app.get('/api/query/time/', async (req, res) => {
+app.post('/api/query/time/', async (req, res) => {
   const timePeriod = req.query.timePeriod;
   const numResults = parseInt(req.query.numResults) || 100;
 
@@ -230,9 +234,7 @@ app.get('/api/query/time/', async (req, res) => {
   const timestampDate = admin.firestore.Timestamp.fromDate(fromDate);
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
-  const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(
-    -Math.abs(numResults),
-  );
+  const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(-Math.abs(numResults));
 
   res.status(200).send(sortedNotesArray);
 });
@@ -322,8 +324,8 @@ const facultyQuery = async (query, notes) => {
   return results;
 };
 // Server content using react clientside
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+app.get('/', (req, res) => {
+  if (req.accept('html')) secres.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

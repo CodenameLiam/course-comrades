@@ -1,11 +1,16 @@
-import React from "react";
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
-import { Home, MyNotes, LikedNotes, Login, PageNotFound } from "./Pages";
-import { firebaseConfig } from "./FirebaseConfig";
-import PrivateRoute from "./Components/Navigation/PrivateRoute";
-import useAuth from "./Hooks/useAuth";
-import PageSpinner from "./Components/Spinners/PageSpinner";
-import * as firebase from "firebase/app";
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
+import { Home, MyNotes, LikedNotes, Login, PageNotFound } from './Pages';
+import { firebaseConfig } from './FirebaseConfig';
+import PrivateRoute from './Components/Navigation/PrivateRoute';
+import useAuth from './Hooks/useAuth';
+import PageSpinner from './Components/Spinners/PageSpinner';
+import * as firebase from 'firebase/app';
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);

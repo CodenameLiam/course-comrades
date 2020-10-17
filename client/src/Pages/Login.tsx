@@ -1,9 +1,22 @@
-import React, { useState } from "react";
-import { TextField, Button, withStyles, InputAdornment, IconButton } from "@material-ui/core";
-import { AccountCircle, Lock, Visibility, VisibilityOff } from "@material-ui/icons";
-import { login } from "../Services/LoginService";
-import { ToastContainer, toast } from "react-toastify";
-import { useHistory, useLocation } from "react-router-dom";
+import React, { useState } from 'react';
+import {
+  TextField,
+  Button,
+  withStyles,
+  InputAdornment,
+  IconButton,
+  Typography,
+} from '@material-ui/core';
+import {
+  AccountCircle,
+  Lock,
+  Visibility,
+  VisibilityOff,
+} from '@material-ui/icons';
+import { login } from '../Services/LoginService';
+import { ToastContainer, toast } from 'react-toastify';
+import { useHistory, useLocation } from 'react-router-dom';
+import logo from '../assets/logo.svg';
 
 interface ILoginState {
   username: string;
@@ -17,13 +30,13 @@ interface ILoginState {
 
 export default function Login() {
   const [state, setState] = useState<ILoginState>({
-    username: "",
-    password: "",
+    username: '',
+    password: '',
     showPassword: false,
     usernameError: false,
     passwordError: false,
     errorStatus: false,
-    errorMessage: "",
+    errorMessage: '',
   });
 
   const history = useHistory();
@@ -59,7 +72,7 @@ export default function Login() {
 
   const handleSuccess = () => {
     let path = new URLSearchParams(location.search);
-    const redirect = path.get("redirect") ? path.get("redirect") : "/";
+    const redirect = path.get('redirect') ? path.get('redirect') : '/';
     history.push(redirect!);
   };
 
@@ -87,7 +100,12 @@ export default function Login() {
 
   return (
     <div className="login">
-      <div className="left" />
+      <div className="left">
+        <div className="logo-container">
+          <img src={logo} alt="logo" className="login-logo" />
+          <Typography variant="h4">UQ Notes</Typography>
+        </div>
+      </div>
       <div className="right">
         <div className="welcome-field">Welcome</div>
         <div className="welcome-underline" />
@@ -98,11 +116,13 @@ export default function Login() {
             variant="outlined"
             fullWidth
             error={state.usernameError}
-            helperText={state.usernameError ? "Please enter a valid username" : ""}
+            helperText={
+              state.usernameError ? 'Please enter a valid username' : ''
+            }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <AccountCircle style={{ color: "#51247a" }} />
+                  <AccountCircle style={{ color: '#51247a' }} />
                 </InputAdornment>
               ),
             }}
@@ -114,13 +134,15 @@ export default function Login() {
             variant="outlined"
             fullWidth
             error={state.passwordError}
-            helperText={state.passwordError ? "Please enter a valid password" : ""}
-            type={state.showPassword ? "text" : "password"}
+            helperText={
+              state.passwordError ? 'Please enter a valid password' : ''
+            }
+            type={state.showPassword ? 'text' : 'password'}
             value={state.password}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock style={{ color: "#51247a" }} />
+                  <Lock style={{ color: '#51247a' }} />
                 </InputAdornment>
               ),
               endAdornment: (
@@ -138,7 +160,12 @@ export default function Login() {
             onChange={handlePasswordChange}
           />
 
-          <LoginButton className="login-button" type="submit" variant="contained" fullWidth>
+          <LoginButton
+            className="login-button"
+            type="submit"
+            variant="contained"
+            fullWidth
+          >
             Login
           </LoginButton>
         </form>
@@ -150,26 +177,26 @@ export default function Login() {
 
 const LoginTextField = withStyles({
   root: {
-    "& .MuiOutlinedInput-root": {
+    '& .MuiOutlinedInput-root': {
       borderRadius: 100,
-      boxShadow: "2px 2px 5px #dddddd",
-      "& fieldset": {
-        transition: "box-shadow 0.3s",
-        borderColor: "#dddddd",
+      boxShadow: '2px 2px 5px #dddddd',
+      '& fieldset': {
+        transition: 'box-shadow 0.3s',
+        borderColor: '#dddddd',
       },
-      "&:hover fieldset": {
-        borderColor: "#dddddd",
-        boxShadow: "2px 2px 10px #dddddd",
+      '&:hover fieldset': {
+        borderColor: '#dddddd',
+        boxShadow: '2px 2px 10px #dddddd',
       },
-      "&.Mui-focused fieldset": {
-        borderColor: "#dddddd",
-        boxShadow: "2px 2px 10px #dddddd",
+      '&.Mui-focused fieldset': {
+        borderColor: '#dddddd',
+        boxShadow: '2px 2px 10px #dddddd',
       },
     },
-    "& .Mui-error": {
-      "& fieldset": {
-        transition: "box-shadow 0.3s",
-        borderColor: "#e62645",
+    '& .Mui-error': {
+      '& fieldset': {
+        transition: 'box-shadow 0.3s',
+        borderColor: '#e62645',
       },
     },
   },
@@ -177,16 +204,17 @@ const LoginTextField = withStyles({
 
 const LoginButton = withStyles({
   root: {
-    background: "linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);",
+    background:
+      'linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);',
     borderRadius: 100,
-    height: "48px",
-    marginTop: "1rem",
-    color: "white",
-    fontSize: "1rem",
+    height: '48px',
+    marginTop: '1rem',
+    color: 'white',
+    fontSize: '1rem',
     fontFamily: "'Poppins', sans-serif",
-    boxShadow: "2px 4px 4px -2px #962abb",
-    "&:hover": {
-      boxShadow: "2px 5px 8px -1px #962abb",
+    boxShadow: '2px 4px 4px -2px #962abb',
+    '&:hover': {
+      boxShadow: '2px 5px 8px -1px #962abb',
     },
   },
 })(Button);
