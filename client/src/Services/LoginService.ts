@@ -1,17 +1,16 @@
 // Firebase App (the core Firebase SDK) is always required and
 // must be listed before other Firebase SDKs
-import { FlareSharp } from "@material-ui/icons";
-import * as firebase from "firebase/app";
+import * as firebase from 'firebase/app';
 
 // Add the Firebase services that you want to use
-import "firebase/auth";
+import 'firebase/auth';
 
 export const register = (
   email: string,
   password: string,
   username: string,
   handleSuccess: (user: firebase.auth.UserCredential) => void,
-  handleError: (e: Error) => void
+  handleError: (e: Error) => void,
 ): void => {
   firebase
     .auth()
@@ -30,7 +29,7 @@ export const login = (
   email: string,
   password: string,
   handleSuccess: (user: firebase.auth.UserCredential) => void,
-  handleError: (e: Error) => void
+  handleError: (e: Error) => void,
 ): void => {
   firebase
     .auth()
@@ -47,7 +46,7 @@ export const login = (
 
 export const logout = (
   handleSuccess: () => void,
-  handleError: (e: Error) => void
+  handleError: (e: Error) => void,
 ): void => {
   firebase
     .auth()
