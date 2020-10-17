@@ -7,12 +7,15 @@ import {
   TableBody,
   TableHead,
 } from '@material-ui/core';
+import * as firebase from 'firebase/app';
 
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Note from '../../Types/Note';
 import moment from 'moment';
 import React from 'react';
+import IconButton from '@material-ui/core/IconButton';
+import Row from './Row';
 
 type TableComponentProps = {
   notes: Note[];
@@ -20,6 +23,7 @@ type TableComponentProps = {
 
 const TableComponent = (props: TableComponentProps) => {
   const { notes } = props;
+
   return (
     <TableContainer component={Paper}>
       <Table className="table" aria-label="top notes">
@@ -34,28 +38,9 @@ const TableComponent = (props: TableComponentProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {notes.map((note: Note, index) => {
-            return (
-              <TableRow key={note.id}>
-                <TableCell component="th" scope="row">
-                  {note.name}
-                </TableCell>
-                <TableCell align="center">{note.courseCode}</TableCell>
-                <TableCell align="center">
-                  {moment(
-                    new Date(parseInt(note.uploadDate._seconds) * 1000),
-                  ).format('DD/MM/YYYY, HH:mm')}
-                </TableCell>
-                <TableCell align="center">{note.likes}</TableCell>
-                <TableCell align="center">
-                  <ThumbUpIcon />
-                </TableCell>
-                <TableCell align="center">
-                  <CloudDownloadIcon />
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {notes.map((note: Note, index) => (
+            <Row note={note} index={index} />
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
