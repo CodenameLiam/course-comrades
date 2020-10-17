@@ -80,11 +80,11 @@ app.post('/api/create-note', async (req, res) => {
   const uploadDate = admin.firestore.Timestamp.fromDate(new Date());
   try {
     if (
-      name === undefined ||
-      author === undefined ||
-      courseCode === undefined ||
-      description === undefined ||
-      hashtags === undefined
+      name == undefined ||
+      author == undefined ||
+      courseCode == undefined ||
+      description == undefined ||
+      hashtags == undefined
     ) {
       throw new Error('Undefined arguments provided');
     }
@@ -104,7 +104,7 @@ app.post('/api/create-note', async (req, res) => {
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    await notesDB.doc(note.id).update({ id: note.id });
+    notesDB.doc(note.id).update({ id: note.id });
 
     hashtags.forEach(function (hashtag) {
       console.log(hashtag);
@@ -126,12 +126,13 @@ app.post('/api/create-note', async (req, res) => {
     await userUploadDB
       .doc(author)
       .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
+
+    // const test = note.id;
+    res.json({ id: note.id, message: 'Succesfully created note' });
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
   }
-
-  res.status(200).send('succesfully created note');
 });
 
 // Handles likes a note
