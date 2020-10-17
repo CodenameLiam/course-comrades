@@ -33,16 +33,17 @@ app.use(express.json());
 const db = admin.firestore();
 const usersDB = db.collection('users');
 const notesDB = db.collection('notes');
-const userLikes = db.collection('user-likes');
+const userLikesDB = db.collection('user-likes');
+const noteLikesDB = db.collection('note-likes');
+const hashtagsDB = db.collection('hashtags-notes');
 
 // Handles Creating notes
-app.post('/create_note', async (req, res) => {
+app.post('/api/create_note', async (req, res) => {
   const name = req.body.name;
   const author = req.body.author;
   const courseCode = req.body.courseCode;
   const description = req.body.description;
   const hashtags = req.body.hashtags;
-
   try {
     // .add() will generate a unique id in firestore
     const note = await notesDB.add({
@@ -53,11 +54,17 @@ app.post('/create_note', async (req, res) => {
       hashtags: hashtags,
       likes: 0,
       downloads: 0,
-      uploadDate: moment().format(),
+      uploadDate: moment().format()
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    await notesDB.doc(note.id).update({ id: note.id });
+    await notesDB.doc(note.id).update({id: note.id});
+
+    hashtags.forEach(function (hashtag){
+      hashtagsDB.doc(hashtag).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true})
+    })
+
+
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -66,37 +73,111 @@ app.post('/create_note', async (req, res) => {
   res.status(200).send('succesfully created note');
 });
 
-// Handles upvoting a note
-app.post('/like_note', async (req, res) => {
+
+// Handles likes a note
+app.post('/api/like_note', async (req, res) => {
   const noteId = req.body.noteId;
   const username = req.body.username;
-
   // Get current likes
-  const currentLikes = await notesDB.doc(noteId).get().data['likes'];
-  const noteRef = notesDB.doc(noteId);
+  try {
+    const currentLikes = getCurrentLikes(req);
+    const noteRef = notesDB.doc(noteId);
 
-  // Updates likes
-  await noteRef.update({
-    likes: currentLikes + 1,
+    // Updates likes
+    await noteRef.update({
+      likes: currentLikes + 1,
+    });
+
+    // Adds note to userlikes and like to notelikes collections
+
+    await userLikesDB.doc(username).update({
+      notes: admin.firestore.FieldValue.arrayUnion(noteId)
+    })
+
+    await noteLikesDB.doc(username).update({
+      users: admin.firestore.FieldValue.arrayUnion(username)
+    })
+
+    res.status(200).send('successfully liked note');
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e);
+  }
   });
 
-  res.status(200).send('succesfully liked note');
-});
+// Handles unliking a note
+  app.post('/api/unlike_note', async (req, res) => {
+    const username = req.body.username;
+    const noteId = req.body.noteId;
+    // Get current likes
+    try {
+      const currentLikes = getCurrentLikes(req);
+      const noteRef = notesDB.doc(noteId);
+
+      // Updates likes
+      await noteRef.update({
+        likes: currentLikes - 1,
+      });
+
+      // Remove note to userlikes and like to notelikes collections
+
+      await userLikesDB.doc(username).update({
+        notes: admin.firestore.FieldValue.arrayRemove(noteId)
+      })
+
+      await noteLikesDB.doc(username).update({
+        users: admin.firestore.FieldValue.arrayRemove(username)
+      })
+
+      res.status(200).send('successfully liked note');
+    } catch (e) {
+      console.log(e);
+      res.status(500).send(e);
+    }
+
+  });
 
 // Handles downloads counter incrementing
-app.post('/download_note', async (req, res) => {
-  const fileLink = req.body.fileLink;
-  const currentDownloads = await notesDB.doc(fileLink).get().data['downloads'];
-  const docRef = notesDB.doc(fileLink);
-  // Updates downloads
-  await docRef.update({
-    downloads: currentDownloads + 1,
+  app.post('/api/add_download', async (req, res) => {
+
+    const noteId = req.body.noteId;
+    try {
+      const docRef = notesDB.doc(noteId);
+      const currentDownloads = await docRef.data['downloads'];
+
+      // Updates downloads
+      await docRef.update({
+        downloads: currentDownloads + 1,
+      });
+      res.status(200).send('successfully added download');
+    } catch (e) {
+      res.status(500).send(e);
+    }
   });
-});
+
+// Query by hastag
+  app.get('/api/query/hashtag', async (req, res) =>{
+    try {
+
+    }
+    catch (e){
+      res.status(500).send(e);
+    }
+  })
+
+
 
 // Server content using react clientside
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
+  app.use((req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  });
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+  var getCurrentLikes = async (req) => {
+    const noteId = req.body.noteId;
+    // Get current likes
+    const currentLikes = await notesDB.doc(noteId).get().data['likes'];
+  }
+
+
+
+  app.listen(port, () => console.log(`Server started on port ${port}`));
