@@ -10,7 +10,7 @@ import path from 'path';
 import _ from 'lodash';
 
 // Use your firebase private key here. Initialize our firebase account, as well as our firestore databases.
-import admin from "firebase-admin";
+import admin from 'firebase-admin';
 import serviceAccount from './firebase-admin-token.js';
 
 // Moment for handling dates
@@ -40,10 +40,8 @@ app.use(express.static('../client/build'));
 // middleware to handle requests with json body
 app.use(express.json());
 
-
 // Handles Creating notes
 app.post('/api/create_note', async (req, res) => {
-
   const name = req.body.name;
   const author = req.body.author;
   const courseCode = req.body.courseCode;
@@ -54,9 +52,14 @@ app.post('/api/create_note', async (req, res) => {
 
   const uploadDate = admin.firestore.Timestamp.fromDate(new Date());
   try {
-    if (name === undefined || author === undefined || courseCode === undefined || description === undefined
-        || hashtags === undefined) {
-      throw new Error("Undefined arguments provided");
+    if (
+      name === undefined ||
+      author === undefined ||
+      courseCode === undefined ||
+      description === undefined ||
+      hashtags === undefined
+    ) {
+      throw new Error('Undefined arguments provided');
     }
     // .add() will generate a unique id in firestore
     const note = await notesDB.add({
@@ -74,16 +77,30 @@ app.post('/api/create_note', async (req, res) => {
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    await notesDB.doc(note.id).update({id: note.id});
+    await notesDB.doc(note.id).update({ id: note.id });
 
     hashtags.forEach(function (hashtag) {
       console.log(hashtag);
-      hashtagsDB.doc(hashtag).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true});
+      hashtagsDB
+        .doc(hashtag)
+        .set(
+          { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
+          { merge: true },
+        );
     });
 
-    await course2NotesDB.doc(courseCode).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true});
-    await course2NotesDB.doc(courseCode).set({notes: admin.firestore.FieldValue.arrayUnion(note.id)}, {merge: true});
-
+    await course2NotesDB
+      .doc(courseCode)
+      .set(
+        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
+        { merge: true },
+      );
+    await course2NotesDB
+      .doc(courseCode)
+      .set(
+        { notes: admin.firestore.FieldValue.arrayUnion(note.id) },
+        { merge: true },
+      );
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -100,7 +117,7 @@ app.post('/api/like_note', async (req, res) => {
   try {
     const currentLikes = await getCurrentLikes(req);
     const noteRef = notesDB.doc(noteId);
-    console.log("CLikes:", currentLikes)
+    console.log('CLikes:', currentLikes);
 
     // Updates likes
     await noteRef.update({
@@ -109,13 +126,19 @@ app.post('/api/like_note', async (req, res) => {
 
     // Adds note to userlikes and like to notelikes collections
 
-    await userLikesDB.doc(username).set({
-      notes: admin.firestore.FieldValue.arrayUnion(noteId)
-    }, {merge: true})
+    await userLikesDB.doc(username).set(
+      {
+        notes: admin.firestore.FieldValue.arrayUnion(noteId),
+      },
+      { merge: true },
+    );
 
-    await noteLikesDB.doc(username).set({
-      users: admin.firestore.FieldValue.arrayUnion(username)
-    }, {merge: true})
+    await noteLikesDB.doc(username).set(
+      {
+        users: admin.firestore.FieldValue.arrayUnion(username),
+      },
+      { merge: true },
+    );
 
     res.status(200).send('successfully liked note');
   } catch (e) {
@@ -129,11 +152,10 @@ app.post('/api/unlike_note', async (req, res) => {
   const username = req.body.username;
   const noteId = req.body.noteId;
 
-
   // Get current likes
   try {
     const currentLikes = getCurrentLikes(req);
-    console.log("CLikes:", currentLikes);
+    console.log('CLikes:', currentLikes);
     const noteRef = notesDB.doc(noteId);
 
     // Updates likes
@@ -144,19 +166,18 @@ app.post('/api/unlike_note', async (req, res) => {
     // Remove note to userlikes and like to notelikes collections
 
     await userLikesDB.doc(username).update({
-      notes: admin.firestore.FieldValue.arrayRemove(noteId)
-    })
+      notes: admin.firestore.FieldValue.arrayRemove(noteId),
+    });
 
     await noteLikesDB.doc(username).update({
-      users: admin.firestore.FieldValue.arrayRemove(username)
-    })
+      users: admin.firestore.FieldValue.arrayRemove(username),
+    });
 
     res.status(200).send('successfully liked note');
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
   }
-
 });
 
 // Handles downloads counter incrementing
@@ -175,7 +196,6 @@ app.post('/api/add_download', async (req, res) => {
     res.status(500).send(e);
   }
 });
-
 
 // // Add a saved note for a user
 // app.post('api/save-note', async (req, res) => {
@@ -211,14 +231,13 @@ app.get('/api/query/time/', async (req, res) => {
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
   const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(
-      -Math.abs(numResults),
+    -Math.abs(numResults),
   );
 
   res.status(200).send(sortedNotesArray);
 });
 
 app.get('/api/search', async (req, res) => {
-
   try {
     const faculty = req.body.faculty;
     const hashtags = req.body.hashtags;
@@ -229,36 +248,33 @@ app.get('/api/search', async (req, res) => {
   } catch (e) {
     res.status(500).send(e);
   }
-})
+});
 
 const getNotes = async (noteIds) => {
   const result = [];
   noteIds.forEach(async function (noteId) {
     const docRef = await notesDB.doc(noteId).get();
     const noteData = docRef.data();
-    result.push(
-        {
-          name: noteData.name,
-          author: noteData.author,
-          description: noteData.description,
-          courseCode: noteData.courseCode,
-          hashtags: noteData.hashtags,
-          likes: noteData.likes,
-          downloads: noteData.downloads,
-          uploadDate: noteData.uploadDate,
-          noteId: noteId
-        }
-    );
-  })
+    result.push({
+      name: noteData.name,
+      author: noteData.author,
+      description: noteData.description,
+      courseCode: noteData.courseCode,
+      hashtags: noteData.hashtags,
+      likes: noteData.likes,
+      downloads: noteData.downloads,
+      uploadDate: noteData.uploadDate,
+      noteId: noteId,
+    });
+  });
   return result;
-}
-
+};
 
 const getCurrentLikes = async (req) => {
   const noteId = req.body.noteId;
   const docRef = await notesDB.doc(noteId).get();
   return await docRef.data().likes;
-}
+};
 
 // Query by hashtag
 const hashtagQuery = async (hashtags) => {
@@ -269,23 +285,20 @@ const hashtagQuery = async (hashtags) => {
       const notes = docRef.data().notes;
       notes.forEach((noteID) => {
         noteIds.push(noteID);
-      })
-    })
+      });
+    });
     return noteIds;
-  } catch (e) {
-
-  }
+  } catch (e) {}
 };
 
 const courseCodeQuery = async (courseCode) => {
   try {
     const docRef = await course2NotesDB.doc(courseCode).get();
     const notes = docRef.data().notes;
-    console.log("NOtes:");
+    console.log('NOtes:');
     return notes;
-  } catch (e) {
-  }
-}
+  } catch (e) {}
+};
 
 // Filter by semester, takes in array of notes, not id's
 const semesterQuery = async (semester, notes) => {
@@ -294,9 +307,9 @@ const semesterQuery = async (semester, notes) => {
     if (note.semester === semester) {
       results.push(note);
     }
-  })
+  });
   return results;
-}
+};
 
 // Filter by faculty, takes in array of notes, not id's
 const facultyQuery = async (query, notes) => {
@@ -305,14 +318,13 @@ const facultyQuery = async (query, notes) => {
     if (note.query === query) {
       results.push(note);
     }
-  })
+  });
   return results;
-}
+};
 // Server content using react clientside
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
-export default class server {
-}
+export default class server {}
