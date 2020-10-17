@@ -184,15 +184,6 @@ app.post('/api/add_download', async (req, res) => {
 //   }
 // })
 
-app.get('/api/search', async (req, res) => {
-  const faculty = req.body.faculty;
-  const hashtags = req.body.hashtags;
-  const semester = req.body.semester;
-  const courseCode = req.body.courseCode;
-  console.log(faculty, hashtags, semester, courseCode);
-  console.log(courseCodeQuery(courseCode));
-})
-
 // Server content using react clientside
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
@@ -228,13 +219,14 @@ app.get('/api/query/time/', async (req, res) => {
   res.status(200).send(sortedNotesArray);
 });
 
-// Query by hastag
-app.get('/api/query/hashtag', async (req, res) => {
-  try {
-  } catch (e) {
-    res.status(500).send(e);
-  }
-});
+app.get('/api/search', async (req, res) => {
+  const faculty = req.body.faculty;
+  const hashtags = req.body.hashtags;
+  const semester = req.body.semester;
+  const courseCode = req.body.courseCode;
+  console.log(faculty, hashtags, semester, courseCode);
+  console.log(courseCodeQuery(courseCode));
+})
 
 const getNotes = async(noteIds) => {
   var result = [];
@@ -256,6 +248,7 @@ const getNotes = async(noteIds) => {
   })
   return result;
 }
+
 
 const getCurrentLikes = async (req) => {
   const noteId = req.body.noteId;
