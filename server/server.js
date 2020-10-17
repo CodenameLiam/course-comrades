@@ -248,6 +248,7 @@ app.post('/api/add-download', async (req, res) => {
 app.post('/api/query/time/', async (req, res) => {
   const timePeriod = req.query.timePeriod;
   const numResults = parseInt(req.query.numResults) || 100;
+  const username = req.body.username;
 
   const fromDate = new Date();
   fromDate.setHours(0, 0, 0, 0);
@@ -269,6 +270,15 @@ app.post('/api/query/time/', async (req, res) => {
   const snapshot = await notesDB.where('uploadDate', '>=', timestampDate).get();
   const notesArray = snapshot.docs.map((doc) => doc.data());
   const sortedNotesArray = _.orderBy(notesArray, ['likes'], ['desc']).splice(-Math.abs(numResults));
+  for (const note of sortedNotesArray){
+    const refDoc = await userLikesDB.doc(username).get();
+    if (refDoc.exists && refDoc.data().notes.includes(note.id)){
+      note.liked = true;
+    }
+    else {
+      note.liked = false;
+    }
+  }
 
   res.status(200).send(sortedNotesArray);
 });
@@ -281,7 +291,7 @@ app.post('api/get-liked-notes', async (req, res) => {
   try {
     const docRef = userLikesDB.doc(username).get();
     if ((await docRef).exists) {
-      const results = await getNotes((await docRef).data().notes);
+      const results = await getNotes((await docRef).data().notes, true);
       res.status(200).send();
     } else {
       res.status(400).send('Bad Request');
@@ -299,6 +309,8 @@ app.get('/api/search', async (req, res) => {
     const hashtags = req.body.hashtags;
     const semester = req.body.semester;
     const courseCode = req.body.courseCode;
+    const username = req.body.username;
+
     console.log(faculty, hashtags, semester, courseCode);
 
     const temp = await courseCodeQuery(courseCode);
@@ -309,7 +321,7 @@ app.get('/api/search', async (req, res) => {
       resultId = Array.from(new Set(resultId.concat(await hashtagQuery(hashtags))));
     }
 
-    let notes = await getNotes(resultId);
+    let notes = await getNotes(resultId, username);
 
     notes = notes.filter((note) => {
       let valid = true;
@@ -330,32 +342,7 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-// Below are all the helper functions used
-
-// Returns an array of note JSON objects from an array of note ID's
-const getNotes = async (noteIds, username) => {
-  const result = [];
-  for (const noteId of noteIds) {
-    const docRef = await notesDB.doc(noteId).get();
-    const noteData = docRef.data();
-    result.push({
-      name: noteData.name,
-      author: noteData.author,
-      description: noteData.description,
-      courseCode: noteData.courseCode,
-      hashtags: noteData.hashtags,
-      likes: noteData.likes,
-      downloads: noteData.downloads,
-      uploadDate: noteData.uploadDate,
-      noteId: noteId,
-      faculty: noteData.faculty,
-      semester: noteData.semester,
-    });
-  }
-  return result;
-};
-
+// Get uploaded notes by a user
 app.use('/api/get-uploaded',async (req, res) =>{
   const username = req.body.username;
   if (!username){
@@ -369,11 +356,48 @@ app.use('/api/get-uploaded',async (req, res) =>{
     res.status(200).send(getNotes(docRef.data().notes))
   }
   catch (e){
-
   }
-
-
 })
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+// Below are all the helper functions used
+
+// Returns an array of note JSON objects from an array of note ID's
+const getNotes = async (noteIds, username) => {
+  const result = [];
+  let likeFlag = false;
+  for (const noteId of noteIds) {
+    const docRef = await notesDB.doc(noteId).get();
+    const likeRef = await userLikesDB.doc(username).get();
+    if (username === true){
+      likeFlag = true;
+    }
+    else {
+      if (likeRef.exists){
+        likeRef.data().notes.includes(noteId)
+        likeFlag = true;
+      }
+    }
+    const noteData = docRef.data();
+    result.push({
+      name: noteData.name,
+      author: noteData.author,
+      description: noteData.description,
+      courseCode: noteData.courseCode,
+      hashtags: noteData.hashtags,
+      likes: noteData.likes,
+      downloads: noteData.downloads,
+      uploadDate: noteData.uploadDate,
+      noteId: noteId,
+      faculty: noteData.faculty,
+      semester: noteData.semester,
+      liked: likeFlag
+    });
+  }
+  return result;
+};
+
+
 
 const getCurrentLikes = async (req) => {
   const noteId = req.body.noteId;
