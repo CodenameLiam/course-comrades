@@ -8,13 +8,8 @@ import {
   TableHead,
 } from '@material-ui/core';
 import * as firebase from 'firebase/app';
-
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Note from '../../Types/Note';
-import moment from 'moment';
-import React from 'react';
-import IconButton from '@material-ui/core/IconButton';
+import React, { useEffect, useState } from 'react';
 import Row from './Row';
 
 type TableComponentProps = {
@@ -23,7 +18,6 @@ type TableComponentProps = {
 
 const TableComponent = (props: TableComponentProps) => {
   const { notes } = props;
-
   return (
     <TableContainer component={Paper}>
       <Table className="table" aria-label="top notes">
@@ -38,8 +32,8 @@ const TableComponent = (props: TableComponentProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {notes.map((note: Note, index) => (
-            <Row note={note} index={index} />
+          {notes.map((note: Note) => (
+            <Row note={note} />
           ))}
         </TableBody>
       </Table>

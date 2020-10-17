@@ -3,21 +3,36 @@ import {
   IconButton,
   InputAdornment,
   withStyles,
-  Paper,
-  Table,
-  TableContainer,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableHead,
-} from "@material-ui/core";
-import { NoteAdd, Search } from "@material-ui/icons";
-import React from "react";
-import Popup from "reactjs-popup";
-import Page from "../Components/Navigation/Page";
-import { SearchTextField } from "./Home";
+} from '@material-ui/core';
+import { NoteAdd, Search } from '@material-ui/icons';
+import React, { useEffect, useState } from 'react';
+import Popup from 'reactjs-popup';
+import Page from '../Components/Navigation/Page';
+import TableComponent from '../Components/Table/Table';
+import Note from '../Types/Note';
+import { SearchTextField } from './Home';
+import * as firebase from 'firebase/app';
 
 export default function MyNotes() {
+  const [myNotes, setMyNotes] = useState<Note[]>([]);
+
+  const user = firebase.auth().currentUser;
+  const username = user?.displayName;
+
+  useEffect(() => {
+    fetch('/api/get-liked-notes', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: username,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data: Note[]) => setMyNotes(data))
+      .catch((e) => console.log(e));
+  }, []);
   return (
     <Page>
       <div className="my-notes">
@@ -34,7 +49,7 @@ export default function MyNotes() {
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="search"
-                      style={{ color: "#ffffff" }}
+                      style={{ color: '#ffffff' }}
                       // onClick={handleClickShowPassword}
                       // onMouseDown={handleMouseDownPassword}
                     >
@@ -65,33 +80,7 @@ export default function MyNotes() {
           </div>
         </div>
         <div className="notes">
-          <TableContainer component={Paper}>
-            <Table className="table" aria-label="top notes">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="center">Course Code</TableCell>
-                  <TableCell align="center">Date Uploaded</TableCell>
-                  <TableCell align="center">Likes</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {/* {state.map((user, index) => {
-                  return (
-                    <TableRow key={user.id}>
-                      <TableCell component="th" scope="row">
-                        {index}
-                      </TableCell>
-                      <TableCell align="center">{user.email}</TableCell>
-                      <TableCell align="center">{user.firstName}</TableCell>
-                      <TableCell align="center">{user.lastName}</TableCell>
-                      <TableCell align="center">{getGroups(user.groups)}</TableCell>
-                    </TableRow>
-                  );
-                })} */}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <TableComponent notes={myNotes} />
         </div>
       </div>
     </Page>
@@ -100,16 +89,17 @@ export default function MyNotes() {
 
 const UploadButton = withStyles({
   root: {
-    background: "linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);",
+    background:
+      'linear-gradient(171deg, rgba(81, 36, 122, 1) 0%, rgba(150, 42, 187, 1) 100%);',
     borderRadius: 100,
-    height: "56px",
-    color: "white",
-    fontSize: "1rem",
+    height: '56px',
+    color: 'white',
+    fontSize: '1rem',
     fontFamily: "'Poppins', sans-serif",
-    boxShadow: "2px 2px 5px #c5c5c5",
+    boxShadow: '2px 2px 5px #c5c5c5',
     // boxShadow: "2px 4px 4px -2px #962abb",
-    "&:hover": {
-      boxShadow: "2px 2px 10px #989898",
+    '&:hover': {
+      boxShadow: '2px 2px 10px #989898',
       // boxShadow: "2px 5px 8px -1px #962abb",
     },
   },
