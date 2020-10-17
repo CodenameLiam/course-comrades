@@ -184,10 +184,6 @@ app.post('/api/add_download', async (req, res) => {
 //   }
 // })
 
-// Server content using react clientside
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
 // Query by likes and time
 app.get('/api/query/time/', async (req, res) => {
   const timePeriod = req.query.timePeriod;
@@ -220,12 +216,18 @@ app.get('/api/query/time/', async (req, res) => {
 });
 
 app.get('/api/search', async (req, res) => {
-  const faculty = req.body.faculty;
-  const hashtags = req.body.hashtags;
-  const semester = req.body.semester;
-  const courseCode = req.body.courseCode;
-  console.log(faculty, hashtags, semester, courseCode);
-  console.log(courseCodeQuery(courseCode));
+
+  try {
+    const faculty = req.body.faculty;
+    const hashtags = req.body.hashtags;
+    const semester = req.body.semester;
+    const courseCode = req.body.courseCode;
+    console.log(faculty, hashtags, semester, courseCode);
+    console.log(courseCodeQuery(courseCode));
+  }
+  catch (e){
+    res.status(500).send(e);
+  }
 })
 
 const getNotes = async(noteIds) => {
@@ -274,9 +276,9 @@ const hashtagQuery =  async (hashtags) => {
 
 const courseCodeQuery = async (courseCode) => {
   try {
-    var noteIds = [];
-    var notes = await course2NotesDB.doc(courseCode).get().data()['notes']
-    return noteIds;
+    const notes = await course2NotesDB.doc(courseCode).get().data()['notes'];
+    console.log("NOtes:");
+    return await course2NotesDB.doc(courseCode).get().data()['notes'];
   }
   catch (e){
   }
