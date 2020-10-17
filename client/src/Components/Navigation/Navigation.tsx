@@ -9,7 +9,7 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import { ExitToApp, Home, Note, NoteAdd } from '@material-ui/icons';
+import { ExitToApp, Home, Note, NoteAdd, Search } from '@material-ui/icons';
 import clsx from 'clsx';
 import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -133,6 +133,7 @@ function NavigationLinks(): LinkInterface[] {
     { label: 'Dashboard', path: '/', icon: <Home /> },
     { label: 'My Notes', path: '/my-notes', icon: <Note /> },
     { label: 'Liked Notes', path: '/liked-notes', icon: <NoteAdd /> },
+    { label: 'Search', path: '/search-notes', icon: <Search /> },
   ];
 }
 

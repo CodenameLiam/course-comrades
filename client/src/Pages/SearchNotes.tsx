@@ -2,24 +2,25 @@ import {
   Button,
   IconButton,
   InputAdornment,
+  Paper,
+  TextField,
   withStyles,
 } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Page from '../Components/Navigation/Page';
 import TableComponent from '../Components/Table/Table';
 import Note from '../Types/Note';
-import { SearchTextField } from './Home';
 import * as firebase from 'firebase/app';
 
-export default function MyNotes() {
-  const [myNotes, setMyNotes] = useState<Note[]>([]);
+export default function SearchNotes() {
+  const [searchedNotes, setSearchedNotes] = useState<Note[]>([]);
 
   const user = firebase.auth().currentUser;
   const username = user?.displayName;
 
-  useEffect(() => {
-    fetch('/api/get-uploaded', {
+  const search = () => {
+    fetch('/api/search', {
       method: 'POST',
       body: JSON.stringify({
         username: username,
@@ -29,39 +30,42 @@ export default function MyNotes() {
       },
     })
       .then((res) => res.json())
-      .then((data: Note[]) => setMyNotes(data))
+      .then((data: Note[]) => setSearchedNotes(data))
       .catch((e) => console.log(e));
-  }, []);
+  };
+
   return (
     <Page>
       <div className="my-notes">
-        <div className="title">My notes</div>
-        <div className="input">
-          <div className="search-notes">
-            <SearchTextField
-              className="search"
-              placeholder="Search your notes..."
-              variant="outlined"
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="search"
-                      style={{ color: '#ffffff' }}
-                      // onClick={handleClickShowPassword}
-                      // onMouseDown={handleMouseDownPassword}
-                    >
-                      <Search />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+        <Paper>
+          <div className="input">
+            <div className="search-notes">
+              <TextField
+                className="search"
+                placeholder="Search your notes..."
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="search"
+                        style={{ color: '#ffffff' }}
+                        // onClick={handleClickShowPassword}
+                        // onMouseDown={handleMouseDownPassword}
+                      >
+                        <Search />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
           </div>
-        </div>
+        </Paper>
+
         <div className="notes">
-          <TableComponent notes={myNotes} />
+          <TableComponent notes={searchedNotes} />
         </div>
       </div>
     </Page>

@@ -61,24 +61,7 @@ export default function LikedNotes() {
               }}
             />
           </div>
-          <div className="upload-notes">
-            <Popup
-              trigger={
-                <UploadButton
-                  className="login-button"
-                  variant="contained"
-                  fullWidth
-                  startIcon={<NoteAdd />}
-                >
-                  Upload New Notes
-                </UploadButton>
-              }
-              modal
-              // closeOnDocumentClick={false}
-            >
-              <div>Popup content here !!</div>
-            </Popup>
-          </div>
+          <div className="upload-notes"></div>
         </div>
         <div className="notes">
           <TableComponent notes={likedNotes} />

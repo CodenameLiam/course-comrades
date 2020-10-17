@@ -4,6 +4,7 @@ import {
   TextField,
   withStyles,
 } from '@material-ui/core';
+import * as firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Page from '../Components/Navigation/Page';
@@ -15,12 +16,16 @@ export default function Home() {
   const history = useHistory();
   const [topNotes, setTopNotes] = useState<Note[]>([]);
 
+  const user = firebase.auth().currentUser;
+  const username = user?.displayName;
+
   useEffect(() => {
     fetch('/api/query/time', {
       method: 'POST',
       body: JSON.stringify({
         timePeriod: 'week',
         numResults: 10,
+        username: username,
       }),
       headers: {
         'Content-Type': 'application/json',

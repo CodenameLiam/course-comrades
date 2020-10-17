@@ -11,6 +11,7 @@ type Note = {
   };
   id: string;
   likes: number;
+  liked: boolean;
   downloads: number;
 };
 

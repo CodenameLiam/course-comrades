@@ -12,6 +12,7 @@ import useAuth from './Hooks/useAuth';
 import PageSpinner from './Components/Spinners/PageSpinner';
 import * as firebase from 'firebase/app';
 import Register from './Pages/Register';
+import SearchNotes from './Pages/SearchNotes';
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -24,6 +25,7 @@ function App() {
           <PrivateRoute exact path="/" component={Home} />
           <PrivateRoute path="/my-notes" component={MyNotes} />
           <PrivateRoute path="/liked-notes" component={LikedNotes} />
+          <PrivateRoute path="/search-notes" component={SearchNotes} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/404" component={PageNotFound} />

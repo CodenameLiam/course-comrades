@@ -281,7 +281,7 @@ app.post('/api/get-liked-notes', async (req, res) => {
   try {
     const docRef = await userLikesDB.doc(username).get();
     if (docRef.exists) {
-      const results = await getNotes((await docRef).data().notes, true);
+      const results = await getNotes((await docRef).data().notes, username);
       res.status(200).send(results);
     } else {
       res.status(400).send('Bad Request');
@@ -355,10 +355,10 @@ const getNotes = async (noteIds, username) => {
   let likeFlag = false;
   for (const noteId of noteIds) {
     const docRef = await notesDB.doc(noteId).get();
-    const likeRef = await userLikesDB.doc(username).get();
-    if (username === true) {
+    if (!!username) {
       likeFlag = true;
     } else {
+      const likeRef = await userLikesDB.doc(username).get();
       if (likeRef.exists) {
         likeRef.data().notes.includes(noteId);
         likeFlag = true;

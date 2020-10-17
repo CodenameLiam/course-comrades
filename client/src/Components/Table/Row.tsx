@@ -15,7 +15,7 @@ const Row = (props: RowComponentProps) => {
   const { note } = props;
 
   const [likes, setLikes] = useState<number | undefined>(undefined);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(note.liked);
 
   const user = firebase.auth().currentUser;
   const username = user?.displayName;

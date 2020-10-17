@@ -1,17 +1,16 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
-import * as firebase from "firebase/app";
-import "./Styles/main.scss";
-import "react-toastify/dist/ReactToastify.css";
-import "reactjs-popup/dist/index.css";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+import './Styles/main.scss';
+import 'react-toastify/dist/ReactToastify.css';
+import 'reactjs-popup/dist/index.css';
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change

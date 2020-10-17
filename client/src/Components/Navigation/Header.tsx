@@ -10,6 +10,7 @@ import {
 import Toolbar from '@material-ui/core/Toolbar';
 import { Button, IconButton, Typography } from '@material-ui/core';
 import PublishIcon from '@material-ui/icons/Publish';
+import Popup from 'reactjs-popup';
 
 const useStyles = makeStyles((theme) => ({
   search: {
@@ -60,16 +61,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const theme = createMuiTheme({
-  overrides: {
-    MuiButton: {
-      textPrimary: {
-        color: 'white',
-      },
-    },
-  },
-});
-
 export default function Header() {
   const classes = useStyles();
 
@@ -91,11 +82,16 @@ export default function Header() {
           />
         </div>
         <div className={classes.upload}>
-          <ThemeProvider theme={theme}>
-            <Button color="primary">
-              Upload Notes <PublishIcon />
-            </Button>
-          </ThemeProvider>
+          <Popup
+            trigger={
+              <Button color="primary">
+                Upload Notes <PublishIcon />
+              </Button>
+            }
+            modal
+          >
+            <div>Popup content here !!</div>
+          </Popup>
         </div>
       </Toolbar>
     </div>
