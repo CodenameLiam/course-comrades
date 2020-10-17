@@ -10,7 +10,7 @@ import path from 'path';
 const app = express();
 
 // Lodash array utils
-const _ = require('lodash');
+import _ from 'lodash';
 
 // Use your firebase private key here. Initialize our firebase account, as well as our firestore databases.
 import admin from "firebase-admin";
@@ -190,7 +190,7 @@ app.get('/api/search', async (req, res) => {
   const semester = req.body.semester;
   const courseCode = req.body.courseCode;
   console.log(faculty, hashtags, semester, courseCode);
-  console.log(helpers.courseCodeQuery(courseCode));
+  console.log(courseCodeQuery(courseCode));
 })
 
 // Server content using react clientside
@@ -277,11 +277,6 @@ const hashtagQuery =  async (hashtags) => {
   } catch (e) {
 
   }
-};
-var getCurrentLikes = async (req) => {
-  const noteId = req.body.noteId;
-  // Get current likes
-  const currentLikes = await notesDB.doc(noteId).get().data['likes'];
 };
 
 const courseCodeQuery = async (courseCode) => {
