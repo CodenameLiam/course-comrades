@@ -23,9 +23,9 @@
     position: relative;
 
     .navigation {
-      width: 20rem;
       height: 100%;
-      background: $grey-1;
+      background: $grey-0;
+      z-index: 5;
     }
 
     .body {
