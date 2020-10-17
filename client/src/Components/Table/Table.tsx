@@ -24,7 +24,9 @@ const TableComponent = (props: TableComponentProps) => {
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
-            <TableCell align="center">Course Code</TableCell>
+            <TableCell align="center">Course</TableCell>
+            <TableCell align="center">Author</TableCell>
+            <TableCell align="center">Hashtags</TableCell>
             <TableCell align="center">Date Uploaded</TableCell>
             <TableCell align="center">Likes</TableCell>
             <TableCell align="center">{''}</TableCell>
