@@ -35,6 +35,12 @@ export default function SearchNotes() {
   const user = firebase.auth().currentUser;
   const username = user?.displayName;
 
+  // useEffect(() => {
+  //   console.log("Test");
+  //   setSearchTerm(getSearchTerm());
+  //   setGetSearch(true);
+  // }, [location.state.search]);
+
   useEffect(() => {
     search();
     // return () => {
@@ -83,8 +89,13 @@ export default function SearchNotes() {
     }
   };
 
+  const request = () => {
+    setSearchTerm(getSearchTerm());
+    setGetSearch(true);
+  };
+
   return (
-    <Page>
+    <Page request={request}>
       <div className="my-notes search">
         <div className="title">Refine search</div>
         <div className="search-bar">
@@ -94,6 +105,7 @@ export default function SearchNotes() {
             defaultValue={searchTerm ? searchTerm : undefined}
             variant="outlined"
             fullWidth
+            value={searchTerm}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
