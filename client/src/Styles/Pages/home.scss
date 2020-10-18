@@ -1,5 +1,6 @@
 .home {
   padding: 4rem;
+  padding-bottom: 0 !important;
 
   .prompt {
     text-align: center;
@@ -19,7 +20,6 @@
 
   .top-notes {
     margin-top: 2rem;
-    margin-bottom: 4rem;
     text-align: center;
     color: $colour-primary;
 

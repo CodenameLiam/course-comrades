@@ -42,7 +42,7 @@ export default function LikedNotes() {
           <div className="search-notes">
             <SearchTextField
               className="search"
-              placeholder="Search your notes..."
+              placeholder="Refine table by note name..."
               variant="outlined"
               fullWidth
               InputProps={{

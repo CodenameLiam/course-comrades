@@ -11,14 +11,24 @@ import Page from '../Components/Navigation/Page';
 import { Search } from '@material-ui/icons';
 import Note from '../Types/Note';
 import TableComponent from '../Components/Table/Table';
+import { filterBySearchString } from '../Services/TableService';
 
 export default function Home() {
   const history = useHistory();
   const [topNotes, setTopNotes] = useState<Note[]>([]);
+  const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
+  const [useFiltereNotes, setUseFilteredNotes] = useState(false);
+  const [searchString, setSearchString] = useState('');
   const [loadData, setLoadData] = useState(false);
 
   const user = firebase.auth().currentUser;
   const username = user?.displayName;
+
+  const handleFilter = (notes: Note[], searchString: string) => {
+    setUseFilteredNotes(true);
+    const filteredNoteArray = filterBySearchString(notes, searchString);
+    setFilteredNotes(filteredNoteArray);
+  };
 
   useEffect(() => {
     fetch('/api/query/time', {
@@ -48,13 +58,15 @@ export default function Home() {
         <div className="search-bar">
           <SearchTextField
             className="search"
-            placeholder="Search..."
+            placeholder="Refine notes by name..."
             variant="outlined"
             fullWidth
+            onChange={(e) => setSearchString(e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
+                    onClick={() => handleFilter(topNotes, searchString)}
                     aria-label="search"
                     style={{ color: '#ffffff' }}
                     // onClick={handleClickShowPassword}
@@ -69,7 +81,7 @@ export default function Home() {
         </div>
         <div className="top-notes">
           <p style={{ marginBottom: '24px' }}>Top Notes</p>
-          <TableComponent notes={topNotes} />
+          <TableComponent notes={useFiltereNotes ? filteredNotes : topNotes} />
         </div>
       </div>
     </Page>

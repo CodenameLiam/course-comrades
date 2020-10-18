@@ -1,5 +1,6 @@
 .my-notes {
   padding: 4rem;
+  padding-bottom: 0 !important;
 
   .title {
     color: $colour-primary;
@@ -8,7 +9,6 @@
 
   .input {
     display: flex;
-    margin-bottom: 2rem;
 
     .search-notes {
       width: 100%;

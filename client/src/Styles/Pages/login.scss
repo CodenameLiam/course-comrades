@@ -1,101 +1,101 @@
 .login,
 .register {
-	display: flex;
-	height: 100vh;
+  display: flex;
+  height: 100vh;
 
-	.left {
-		background: $colour-primary;
-		background: $colour-primary-gradient;
-		width: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+  .left {
+    background: $colour-primary;
+    background: $colour-primary-gradient;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-		.logo-container {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: white;
-			svg {
-				width: 12rem;
-				fill: #ffffff;
-			}
-			.logo-text {
-				font-size: 3rem;
-			}
-		}
-	}
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      svg {
+        width: 12rem;
+        fill: #ffffff;
+      }
+      .logo-text {
+        font-size: 3rem;
+      }
+    }
+  }
 
-	.right {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		text-align: center;
-		width: 50%;
+  .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 50%;
 
-		.welcome-field {
-			color: $colour-primary;
-			font-size: 3rem;
-			line-height: 3rem;
-		}
+    .welcome-field {
+      color: $colour-primary;
+      font-size: 3rem;
+      line-height: 3rem;
+    }
 
-		.welcome-underline {
-			margin: 0.5rem auto;
-			margin-bottom: 2rem;
-			width: 18rem;
-			height: 0.25rem;
-			background: $colour-primary;
-			background: $colour-primary-gradient;
-		}
+    .welcome-underline {
+      margin: 0.5rem auto;
+      margin-bottom: 2rem;
+      width: 18rem;
+      height: 0.25rem;
+      background: $colour-primary;
+      background: $colour-primary-gradient;
+    }
 
-		.form {
-			padding: 2rem;
-			margin: 0rem auto;
-			width: 50%;
+    .form {
+      padding: 2rem;
+      margin: 0rem auto;
+      width: 50%;
 
-			.username,
-			.email,
-			.password {
-				margin-bottom: 2rem;
-			}
+      .username,
+      .email,
+      .password {
+        margin-bottom: 2rem;
+      }
 
-			input:-webkit-autofill {
-				-webkit-box-shadow: 200px 200px 100px white inset;
-				box-shadow: 200px 200px 100px white inset;
-			}
-		}
+      input:-webkit-autofill {
+        -webkit-box-shadow: 200px 200px 100px white inset;
+        box-shadow: 200px 200px 100px white inset;
+      }
+    }
 
-		.register-footer {
-			text-align: center;
-			margin: 0rem 6rem;
-			margin-top: 2rem;
-			border-bottom: 2px solid transparent;
-			&:hover {
-				cursor: pointer;
-				border-bottom: 2px solid #000000;
-			}
-		}
+    .register-footer {
+      text-align: center;
+      margin: 0rem 6rem;
+      margin-top: 2rem;
+      border-bottom: 2px solid transparent;
+      &:hover {
+        cursor: pointer;
+        border-bottom: 2px solid #000000;
+      }
+    }
 
-		.form-footer {
-			display: flex;
-			justify-content: space-between;
-			margin-top: 2rem;
-			.register-text,
-			.create-text,
-			.forgot-text {
-				// margin: auto;
-				border-bottom: 2px solid transparent;
-				transition: 0.3s all;
-				&:hover {
-					cursor: pointer;
-					border-bottom: 2px solid #000000;
-				}
-			}
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      .register-text,
+      .create-text,
+      .forgot-text {
+        // margin: auto;
+        border-bottom: 2px solid transparent;
+        transition: 0.3s all;
+        &:hover {
+          cursor: pointer;
+          border-bottom: 2px solid #000000;
+        }
+      }
 
-			.register-text {
-				margin: auto;
-			}
-			// justify-content: center;
-		}
-	}
+      .register-text {
+        margin: auto;
+      }
+      // justify-content: center;
+    }
+  }
 }
