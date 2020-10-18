@@ -14,7 +14,8 @@ import PublishIcon from "@material-ui/icons/Publish";
 import Popup from "reactjs-popup";
 import { Search } from "@material-ui/icons";
 import Modal from "../Modal/Modal";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface IHeaderProps {
   request: () => void;
@@ -23,10 +24,17 @@ interface IHeaderProps {
 export default function Header(props: IHeaderProps) {
   const [search, setSearch] = useState("");
   const history = useHistory();
+  const location = useLocation();
 
   const handleSearch = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    history.push("/search-notes", { search: search });
+    if (location.pathname == "/search-notes") {
+      location.state = { search: search };
+      props.request();
+      // console.log("hello");
+    } else {
+      history.push("/search-notes", { search: search });
+    }
   };
 
   const handleEnterSearch = (e: React.KeyboardEvent<HTMLDivElement>) => {
