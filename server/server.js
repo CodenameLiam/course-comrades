@@ -80,11 +80,11 @@ app.post('/api/create-note', async (req, res) => {
   const uploadDate = admin.firestore.Timestamp.fromDate(new Date());
   try {
     if (
-      name == undefined ||
-      author == undefined ||
-      courseCode == undefined ||
-      description == undefined ||
-      hashtags == undefined
+      name === undefined ||
+      author === undefined ||
+      courseCode === undefined ||
+      description === undefined ||
+      hashtags === undefined
     ) {
       throw new Error('Undefined arguments provided');
     }
@@ -104,10 +104,9 @@ app.post('/api/create-note', async (req, res) => {
     });
 
     // add an id attribute to the notes object to make it easier for the frontend
-    notesDB.doc(note.id).update({ id: note.id });
+    await notesDB.doc(note.id).update({ id: note.id });
 
     hashtags.forEach(function (hashtag) {
-      console.log(hashtag);
       hashtagsDB
         .doc(hashtag)
         .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
@@ -348,7 +347,20 @@ app.post('/api/get-uploaded', async (req, res) => {
   } catch (e) {}
 });
 
+app.post('/api/get-hashtags', ( async (req, res) => {
+  const docRef = await hashtagsDB.listDocuments();
+  const hashtags = docRef.map(it => it.id);
+  console.log(hashtags);
+  res.status(200).send(hashtags);
+}));
+
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
+app.get('api/deploy/ping', (req,res) => {
+  console.log('Ping received');
+  res.status(200).send("Ping received")
+});
+
 // Below are all the helper functions used
 
 // Returns an array of note JSON objects from an array of note ID's
