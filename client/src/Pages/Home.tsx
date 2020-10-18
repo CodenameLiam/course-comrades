@@ -21,14 +21,14 @@ export default function Home() {
   const [searchString, setSearchString] = useState('');
   const [loadData, setLoadData] = useState(false);
 
-  const user = firebase.auth().currentUser;
-  const username = user?.displayName;
-
   const handleFilter = (notes: Note[], searchString: string) => {
     setUseFilteredNotes(true);
     const filteredNoteArray = filterBySearchString(notes, searchString);
     setFilteredNotes(filteredNoteArray);
   };
+
+  const user = firebase.auth().currentUser;
+  const username = user?.displayName;
 
   useEffect(() => {
     fetch('/api/query/time', {
@@ -58,7 +58,7 @@ export default function Home() {
         <div className="search-bar">
           <SearchTextField
             className="search"
-            placeholder="Refine notes by name..."
+            placeholder="Refine table by note name..."
             variant="outlined"
             fullWidth
             onChange={(e) => setSearchString(e.target.value)}
