@@ -347,18 +347,18 @@ app.post('/api/get-uploaded', async (req, res) => {
   } catch (e) {}
 });
 
-app.post('/api/get-hashtags', ( async (req, res) => {
+app.get('/api/get-hashtags', async (req, res) => {
   const docRef = await hashtagsDB.listDocuments();
-  const hashtags = docRef.map(it => it.id);
+  const hashtags = docRef.map((it) => it.id);
   console.log(hashtags);
   res.status(200).send(hashtags);
-}));
+});
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
-app.get('api/deploy/ping', (req,res) => {
+app.get('api/deploy/ping', (req, res) => {
   console.log('Ping received');
-  res.status(200).send("Ping received")
+  res.status(200).send('Ping received');
 });
 
 // Below are all the helper functions used
