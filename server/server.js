@@ -291,7 +291,7 @@ app.post('/api/get-liked-notes', async (req, res) => {
   }
 });
 
-app.get('/api/search', async (req, res) => {
+app.post('/api/search', async (req, res) => {
   try {
     let resultId = [];
     const faculty = req.body.faculty;
@@ -302,11 +302,11 @@ app.get('/api/search', async (req, res) => {
 
     console.log(faculty, hashtags, semester, courseCode);
 
-    const temp = await courseCodeQuery(courseCode);
-    if (courseCode !== undefined) {
+    // const temp = await courseCodeQuery(courseCode);
+    if (courseCode != undefined) {
       resultId = resultId.concat(await courseCodeQuery(courseCode));
     }
-    if (hashtags !== undefined) {
+    if (hashtags != undefined) {
       resultId = Array.from(new Set(resultId.concat(await hashtagQuery(hashtags))));
     }
 
@@ -325,7 +325,7 @@ app.get('/api/search', async (req, res) => {
     });
     console.log(notes);
 
-    res.status(200).send(res);
+    res.status(200).send(notes);
   } catch (e) {
     res.status(500).send(e);
   }
@@ -347,18 +347,18 @@ app.post('/api/get-uploaded', async (req, res) => {
   } catch (e) {}
 });
 
-app.post('/api/get-hashtags', ( async (req, res) => {
+app.post('/api/get-hashtags', async (req, res) => {
   const docRef = await hashtagsDB.listDocuments();
-  const hashtags = docRef.map(it => it.id);
+  const hashtags = docRef.map((it) => it.id);
   console.log(hashtags);
   res.status(200).send(hashtags);
-}));
+});
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
-app.get('api/deploy/ping', (req,res) => {
+app.get('api/deploy/ping', (req, res) => {
   console.log('Ping received');
-  res.status(200).send("Ping received")
+  res.status(200).send('Ping received');
 });
 
 // Below are all the helper functions used

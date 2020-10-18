@@ -6,11 +6,11 @@ import {
   TableCell,
   TableBody,
   TableHead,
-} from '@material-ui/core';
-import * as firebase from 'firebase/app';
-import Note from '../../Types/Note';
-import React, { useEffect, useState } from 'react';
-import Row from './Row';
+} from "@material-ui/core";
+import * as firebase from "firebase/app";
+import Note from "../../Types/Note";
+import React, { useEffect, useState } from "react";
+import Row from "./Row";
 
 type TableComponentProps = {
   notes: Note[];
@@ -29,8 +29,8 @@ const TableComponent = (props: TableComponentProps) => {
             <TableCell align="center">Hashtags</TableCell>
             <TableCell align="center">Date Uploaded</TableCell>
             <TableCell align="center">Likes</TableCell>
-            <TableCell align="center">{''}</TableCell>
-            <TableCell align="center">{''}</TableCell>
+            <TableCell align="center">{""}</TableCell>
+            <TableCell align="center">{""}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

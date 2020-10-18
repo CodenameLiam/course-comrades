@@ -8,35 +8,35 @@ import Note from "../Types/Note";
 import TableComponent from "../Components/Table/Table";
 
 export default function Home() {
-	const history = useHistory();
-	const [topNotes, setTopNotes] = useState<Note[]>([]);
-	const [loadData, setLoadData] = useState(false);
+  const history = useHistory();
+  const [topNotes, setTopNotes] = useState<Note[]>([]);
+  const [loadData, setLoadData] = useState(false);
 
-	const user = firebase.auth().currentUser;
-	const username = user?.displayName;
+  const user = firebase.auth().currentUser;
+  const username = user?.displayName;
 
-	useEffect(() => {
-		fetch("/api/query/time", {
-			method: "POST",
-			body: JSON.stringify({
-				timePeriod: "week",
-				numResults: 10,
-				username: username,
-			}),
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
-			.then((res) => res.json())
-			.then((data: Note[]) => setTopNotes(data))
-			.catch((e) => console.log(e));
-		setLoadData(false);
-	}, [loadData]);
+  useEffect(() => {
+    fetch("/api/query/time", {
+      method: "POST",
+      body: JSON.stringify({
+        timePeriod: "week",
+        numResults: 10,
+        username: username,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data: Note[]) => setTopNotes(data))
+      .catch((e) => console.log(e));
+    setLoadData(false);
+  }, [loadData]);
 
-	return (
-		<Page request={() => setLoadData(true)}>
-			<div className="home">
-				<div className="prompt">
+  return (
+    <Page request={() => setLoadData(true)}>
+      <div className="home">
+        {/* <div className="prompt">
 					<p>Boost your mark!</p>
 					<p>Find subject notes at UQ</p>
 				</div>
@@ -61,48 +61,48 @@ export default function Home() {
 							),
 						}}
 					/>
-				</div>
-				<div className="top-notes">
-					<p>Top Notes</p>
-					<TableComponent notes={topNotes} />
-				</div>
-			</div>
-		</Page>
+				</div> */}
+        <div className="top-notes">
+          <p>Top Notes</p>
+          <TableComponent notes={topNotes} />
+        </div>
+      </div>
+    </Page>
 
-		// 	<Button onClick={() => logout(handleSuccess, handleError)}>Logout</Button>
-		// 	<ToastContainer />
-		// </div>
-	);
+    // 	<Button onClick={() => logout(handleSuccess, handleError)}>Logout</Button>
+    // 	<ToastContainer />
+    // </div>
+  );
 }
 
 export const SearchTextField = withStyles({
-	root: {
-		"& .MuiOutlinedInput-root": {
-			borderRadius: 100,
-			boxShadow: "2px 2px 5px #dddddd",
-			background: "#51247a",
-			"& input": {
-				background: "#ffffff",
-				borderRadius: "100rem 0rem 0rem 100rem",
-			},
-			"& fieldset": {
-				transition: "box-shadow 0.3s",
-				borderColor: "#dddddd",
-			},
-			"&:hover fieldset": {
-				borderColor: "#dddddd",
-				boxShadow: "2px 2px 10px #dddddd",
-			},
-			"&.Mui-focused fieldset": {
-				borderColor: "#dddddd",
-				boxShadow: "2px 2px 10px #dddddd",
-			},
-		},
-		"& .Mui-error": {
-			"& fieldset": {
-				transition: "box-shadow 0.3s",
-				borderColor: "#e62645",
-			},
-		},
-	},
+  root: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 100,
+      boxShadow: "2px 2px 5px #dddddd",
+      background: "#51247a",
+      "& input": {
+        background: "#ffffff",
+        borderRadius: "100rem 0rem 0rem 100rem",
+      },
+      "& fieldset": {
+        transition: "box-shadow 0.3s",
+        borderColor: "#dddddd",
+      },
+      "&:hover fieldset": {
+        borderColor: "#dddddd",
+        boxShadow: "2px 2px 10px #dddddd",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#dddddd",
+        boxShadow: "2px 2px 10px #dddddd",
+      },
+    },
+    "& .Mui-error": {
+      "& fieldset": {
+        transition: "box-shadow 0.3s",
+        borderColor: "#e62645",
+      },
+    },
+  },
 })(TextField);
