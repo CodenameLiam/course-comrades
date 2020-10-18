@@ -25,6 +25,16 @@ export default function MyNotes() {
     setFilteredNotes(filteredNoteArray);
   };
 
+  const handleEnterSearch = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    notes: Note[],
+    searchString: string,
+  ) => {
+    if (e.key === 'Enter') {
+      handleFilter(notes, searchString);
+    }
+  };
+
   const user = firebase.auth().currentUser;
   const username = user?.displayName;
 
@@ -54,6 +64,7 @@ export default function MyNotes() {
               variant="outlined"
               fullWidth
               onChange={(e) => setSearchString(e.target.value)}
+              onKeyDown={(e) => handleEnterSearch(e, myNotes, searchString)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
