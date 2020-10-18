@@ -298,13 +298,11 @@ app.post('/api/get-liked-notes', async (req, res) => {
 app.post('/api/search', async (req, res) => {
   try {
     let resultId = [];
-    let resultIdtmp = [];
     const faculty = req.body.faculty;
     const hashtags = req.body.hashtags;
     const semester = req.body.semester;
     const courseCode = req.body.courseCode;
     const username = req.body.username;
-    const noteName = req.body.noteName;
 
     console.log(faculty, hashtags, semester, courseCode);
 
@@ -317,16 +315,9 @@ app.post('/api/search', async (req, res) => {
     // Hashtag query
     if (hashtags !== undefined) {
       const tags = await hashtagQuery(hashtags);
-      resultId.concat(tags);
+      resultId = resultId.concat(tags);
     }
-    // Notename query
-    if (noteName !== undefined) {
-      const noteRef = await notesDB.listDocuments();
-      const resultIdtmp = noteRef
-        .filter((value) => value.name.includes(noteName))
-        .map((note) => note.id);
-      resultId = Array.from(new Set(resultIdtmp.concat(resultId)));
-    }
+
 
     // Coursecode filter
 
@@ -346,13 +337,19 @@ app.post('/api/search', async (req, res) => {
       }
       return valid;
     });
-    console.log(notes);
-
     res.status(200).send(notes);
   } catch (e) {
+    console.log(e);
     res.status(500).send(e);
   }
 });
+
+// Get note
+app.post('/api/get-note', async (req, res) =>{
+  const id = [req.body.id];
+  const username = req.body.username;
+  return await getNotes(id, username);
+})
 
 // Get uploaded notes by a user
 app.post('/api/get-uploaded', async (req, res) => {
@@ -367,7 +364,8 @@ app.post('/api/get-uploaded', async (req, res) => {
     }
     const userNotes = await getNotes(docRef.data().notes, username);
     res.status(200).send(userNotes);
-  } catch (e) {}
+  } catch (e) {
+  }
 });
 
 app.post('/api/get-hashtags', async (req, res) => {
@@ -401,8 +399,9 @@ const getNotes = async (noteIds, username) => {
     if (docRef.exists) {
       const likeRef = await userLikesDB.doc(username).get();
       if (likeRef.exists) {
-        likeRef.data().notes.includes(noteId);
-        likeFlag = true;
+        if (likeRef.data().notes.includes(noteId)) {
+          likeFlag = true;
+        }
       }
 
       const noteData = docRef.data();
