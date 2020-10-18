@@ -9,7 +9,7 @@ import path from 'path';
 // Lodash array utils
 import _ from 'lodash';
 
-// Get google build storage
+``//  google build storage
 // import { CloudBuildClient } from '@google-cloud/cloudbuild';
 // Load SwaggerUI
 
@@ -348,7 +348,8 @@ app.post('/api/search', async (req, res) => {
 app.post('/api/get-note', async (req, res) =>{
   const id = [req.body.id];
   const username = req.body.username;
-  return await getNotes(id, username);
+  const notes = await getNotes(id, username);
+  res.status(200).send(notes);
 })
 
 // Get uploaded notes by a user
