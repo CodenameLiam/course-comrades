@@ -10,7 +10,7 @@ import path from 'path';
 import _ from 'lodash';
 
 // Get google build storage
-import { CloudBuildClient } from '@google-cloud/cloudbuild';
+// import { CloudBuildClient } from '@google-cloud/cloudbuild';
 // Load SwaggerUI
 
 import swaggerUI from 'swagger-ui-express';
