@@ -11,9 +11,19 @@ import TableComponent from '../Components/Table/Table';
 import Note from '../Types/Note';
 import { SearchTextField } from './Home';
 import * as firebase from 'firebase/app';
+import { filterBySearchString } from '../Services/TableService';
 
 export default function MyNotes() {
   const [myNotes, setMyNotes] = useState<Note[]>([]);
+  const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
+  const [useFiltereNotes, setUseFilteredNotes] = useState(false);
+  const [searchString, setSearchString] = useState('');
+
+  const handleFilter = (notes: Note[], searchString: string) => {
+    setUseFilteredNotes(true);
+    const filteredNoteArray = filterBySearchString(notes, searchString);
+    setFilteredNotes(filteredNoteArray);
+  };
 
   const user = firebase.auth().currentUser;
   const username = user?.displayName;
@@ -40,13 +50,15 @@ export default function MyNotes() {
           <div className="search-notes">
             <SearchTextField
               className="search"
-              placeholder="Refine table by note name..."
+              placeholder="Search your notes..."
               variant="outlined"
               fullWidth
+              onChange={(e) => setSearchString(e.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
+                      onClick={() => handleFilter(myNotes, searchString)}
                       aria-label="search"
                       style={{ color: '#ffffff' }}
                       // onClick={handleClickShowPassword}
@@ -61,7 +73,7 @@ export default function MyNotes() {
           </div>
         </div>
         <div className="notes">
-          <TableComponent notes={myNotes} />
+          <TableComponent notes={useFiltereNotes ? filteredNotes : myNotes} />
         </div>
       </div>
     </Page>
