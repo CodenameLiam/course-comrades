@@ -9,7 +9,7 @@ import { Cancel, Description, Highlight } from '@material-ui/icons';
 import axios from 'axios';
 import { upload } from '../../Services/FileService';
 import { toast } from 'react-toastify';
-
+import { hashtags } from '../../hashtags';
 interface IModalState {
   file: File | undefined;
   author: string | undefined | null;
@@ -161,8 +161,6 @@ export default function Modal(props: IModalProps) {
       // && !semesterError
     );
   };
-
-  const hashtags = ['Easy', 'Maths', 'Poop', 'Yes', 'Solid', 'I win'];
 
   return (
     <div className="modal">

@@ -10,7 +10,7 @@ import path from 'path';
 import _ from 'lodash';
 
 // Get google build storage
-import { CloudBuildClient } from '@google-cloud/cloudbuild';
+// import { CloudBuildClient } from '@google-cloud/cloudbuild';
 // Load SwaggerUI
 
 import swaggerUI from 'swagger-ui-express';
@@ -44,7 +44,6 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const port = 5000;
 
 const router = express.Router();
-
 
 // Serve static assets built from the clientside
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -109,7 +108,7 @@ app.post('/api/create-note', async (req, res) => {
     // add an id attribute to the notes object to make it easier for the frontend
     await notesDB.doc(note.id).update({ id: note.id });
 
-    hashtags.forEach(function(hashtag) {
+    hashtags.forEach(function (hashtag) {
       hashtagsDB
         .doc(hashtag)
         .set({ notes: admin.firestore.FieldValue.arrayUnion(note.id) }, { merge: true });
@@ -303,22 +302,19 @@ app.get('/api/search', async (req, res) => {
     const courseCode = req.body.courseCode;
     const username = req.body.username;
 
-    console.log(faculty, semester, hashtags);
-
-// Hashtag query
+    // Hashtag query
     if (hashtags !== undefined) {
       const tags = await hashtagQuery(hashtags);
       resultId = resultId.concat(tags);
     }
 
 
-// Coursecode filter
-
+    // Coursecode filter
 
     let notes = await getNotes(resultId, username);
 
     if (courseCode !== undefined) {
-      notes = notes.filter(value => value.courseCode === courseCode);
+      notes = notes.filter((value) => value.courseCode === courseCode);
     }
 
     notes = notes.filter((note) => {
@@ -362,17 +358,18 @@ app.post('/api/get-uploaded', async (req, res) => {
   }
 });
 
-app.post('/api/get-hashtags', (async (req, res) => {
+app.get('/api/get-hashtags', async (req, res) => {
   const docRef = await hashtagsDB.listDocuments();
-  const hashtags = docRef.map(it => it.id);
+  const hashtags = docRef.map((it) => it.id);
+  console.log(hashtags);
   res.status(200).send(hashtags);
-}));
+});
 
-app.post('/api/get-courses', (async (req, res) => {
+app.post('/api/get-courses', async (req, res) => {
   const docRef = await course2NotesDB.listDocuments();
-  const courses = docRef.map(it => it.id);
+  const courses = docRef.map((it) => it.id);
   res.status(200).send(courses);
-}));
+});
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
@@ -469,10 +466,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
   } catch (e) {
     console.log(e);
-
   }
 });
 
 app.listen(port, () => console.log(`Server started on port ${port}`));
-export default class server {
-}
+export default class server {}
