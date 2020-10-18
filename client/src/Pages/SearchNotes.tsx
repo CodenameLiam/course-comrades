@@ -118,7 +118,7 @@ export default function SearchNotes() {
             <div className="search-notes">
               <TextField
                 className="search"
-                placeholder="Search your notes..."
+                placeholder="Refine table by note name..."
                 variant="outlined"
                 fullWidth
                 InputProps={{
