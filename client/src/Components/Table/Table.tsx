@@ -19,7 +19,11 @@ type TableComponentProps = {
 const TableComponent = (props: TableComponentProps) => {
   const { notes } = props;
   return (
-    <TableContainer component={Paper}>
+    <TableContainer
+      component={Paper}
+      className="note-table"
+      style={{ boxShadow: "2px 2px 5px #dddddd" }}
+    >
       <Table className="table" aria-label="top notes">
         <TableHead>
           <TableRow>

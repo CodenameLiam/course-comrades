@@ -1,12 +1,13 @@
-import * as firebase from "firebase/app";
-import "firebase/storage";
+import * as firebase from 'firebase/app';
+import 'firebase/storage';
+import { saveAs } from 'file-saver';
 
 // You should wrap this in a try catch
 export const upload = (
   file: File,
   noteId: string,
   noteName: string,
-  handleSuccess: (val: firebase.storage.UploadTaskSnapshot) => void
+  handleSuccess: (val: firebase.storage.UploadTaskSnapshot) => void,
 ) => {
   const storageRef = firebase.storage().ref();
   const noteRef = storageRef.child(`notes/${noteId}/${noteName}.pdf`);
@@ -20,11 +21,12 @@ export const download = (noteId: string, noteName: string) => {
     .getDownloadURL()
     .then((url) => {
       const xhr = new XMLHttpRequest();
-      xhr.responseType = "blob";
+      xhr.responseType = 'blob';
       xhr.onload = function (event) {
         const blob = xhr.response;
+        saveAs(blob, `${noteName}.pdf`);
       };
-      xhr.open("GET", url);
+      xhr.open('GET', url);
       xhr.send();
     });
 };
