@@ -19,13 +19,15 @@
   }
 
   .top-notes {
-    margin-top: 2rem;
+    // margin-top: 6rem;
+    margin-bottom: 4rem;
     text-align: center;
     color: $colour-primary;
 
     p {
       font-size: 1.5rem;
       margin: 0rem;
+      margin-bottom: 2rem;
     }
   }
 }

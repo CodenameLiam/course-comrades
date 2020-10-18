@@ -51,37 +51,35 @@ export default function Home() {
   return (
     <Page request={() => setLoadData(true)}>
       <div className="home">
-        <div className="prompt">
-          <p>Boost your mark!</p>
-          <p>Find subject notes at UQ</p>
-        </div>
-        <div className="search-bar">
-          <SearchTextField
-            className="search"
-            placeholder="Refine table by note name..."
-            variant="outlined"
-            fullWidth
-            onChange={(e) => setSearchString(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => handleFilter(topNotes, searchString)}
-                    aria-label="search"
-                    style={{ color: '#ffffff' }}
-                    // onClick={handleClickShowPassword}
-                    // onMouseDown={handleMouseDownPassword}
-                  >
-                    <Search />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </div>
+        {/* <div className="prompt">
+					<p>Boost your mark!</p>
+					<p>Find subject notes at UQ</p>
+				</div>
+				<div className="search-bar">
+					<SearchTextField
+						className="search"
+						placeholder="Search..."
+						variant="outlined"
+						fullWidth
+						InputProps={{
+							endAdornment: (
+								<InputAdornment position="end">
+									<IconButton
+										aria-label="search"
+										style={{ color: "#ffffff" }}
+										// onClick={handleClickShowPassword}
+										// onMouseDown={handleMouseDownPassword}
+									>
+										<Search />
+									</IconButton>
+								</InputAdornment>
+							),
+						}}
+					/>
+				</div> */}
         <div className="top-notes">
-          <p style={{ marginBottom: '24px' }}>Top Notes</p>
-          <TableComponent notes={useFiltereNotes ? filteredNotes : topNotes} />
+          <p>Top Notes</p>
+          <TableComponent notes={topNotes} />
         </div>
       </div>
     </Page>

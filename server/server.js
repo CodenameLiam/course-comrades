@@ -46,7 +46,9 @@ const port = 5000;
 const router = express.Router();
 
 // Serve static assets built from the clientside
-app.use(express.static(path.join(__dirname, '../client/build')));
+// app.use(express.static(path.join(__dirname, '../client/build')));
+app.use(express.static('./../client/build'));
+// app.use(express.static({ root: './../client/build' }));
 
 // middleware to handle requests with json body
 app.use(express.json());
@@ -293,7 +295,7 @@ app.post('/api/get-liked-notes', async (req, res) => {
   }
 });
 
-app.get('/api/search', async (req, res) => {
+app.post('/api/search', async (req, res) => {
   try {
     let resultId = [];
     const faculty = req.body.faculty;
@@ -302,6 +304,14 @@ app.get('/api/search', async (req, res) => {
     const courseCode = req.body.courseCode;
     const username = req.body.username;
 
+    console.log(faculty, hashtags, semester, courseCode);
+
+    // const temp = await courseCodeQuery(courseCode);
+    if (courseCode != undefined) {
+      resultId = resultId.concat(await courseCodeQuery(courseCode));
+    }
+    // if (hashtags != undefined) {
+    //   resultId = Array.from(new Set(resultId.concat(await hashtagQuery(hashtags))));
     // Hashtag query
     if (hashtags !== undefined) {
       const tags = await hashtagQuery(hashtags);
@@ -358,7 +368,7 @@ app.post('/api/get-uploaded', async (req, res) => {
   }
 });
 
-app.get('/api/get-hashtags', async (req, res) => {
+app.post('/api/get-hashtags', async (req, res) => {
   const docRef = await hashtagsDB.listDocuments();
   const hashtags = docRef.map((it) => it.id);
   console.log(hashtags);
@@ -462,8 +472,10 @@ const courseCodeQuery = async (courseCode) => {
 
 // Server content using react clientside
 app.get('/', (req, res) => {
+  // path.join(__dirname, '../client/build', 'index.html')
   try {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    res.sendFile('index.html', { root: './../client/build' });
+    // res.sendFile(path.join(__dirname, '../client/build') + 'index.html');
   } catch (e) {
     console.log(e);
   }

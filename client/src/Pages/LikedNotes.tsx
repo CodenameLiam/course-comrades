@@ -4,9 +4,8 @@ import {
   InputAdornment,
   withStyles,
 } from '@material-ui/core';
-import { NoteAdd, Search } from '@material-ui/icons';
+import { Search } from '@material-ui/icons';
 import React, { useEffect, useState } from 'react';
-import Popup from 'reactjs-popup';
 import Page from '../Components/Navigation/Page';
 import TableComponent from '../Components/Table/Table';
 import Note from '../Types/Note';
@@ -47,7 +46,7 @@ export default function LikedNotes() {
   return (
     <Page>
       <div className="my-notes">
-        <div className="title">liked notes</div>
+        <div className="title">Liked notes</div>
         <div className="input">
           <div className="search-notes">
             <SearchTextField
