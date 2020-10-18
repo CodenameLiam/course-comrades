@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import IconButton from "@material-ui/core/IconButton";
 import { download } from "../../Services/FileService";
 import { useHistory } from "react-router";
+import axios from "axios";
 
 type RowComponentProps = {
   note: Note;
@@ -53,7 +54,7 @@ const Row = (props: RowComponentProps) => {
   };
   // onClick={() => history.push(`/note/${note.id}`)}
   return (
-    <TableRow key={note.id} onClick={() => history.push(`/note/${note.id}`)}>
+    <TableRow key={note.id} onClick={() => openPDF(note.id)}>
       <TableCell component="th" scope="row">
         {note.name}
       </TableCell>
@@ -77,5 +78,20 @@ const Row = (props: RowComponentProps) => {
     </TableRow>
   );
 };
+
+function openPDF(id: string) {
+  const storageRef = firebase.storage().ref();
+  const user = firebase.auth().currentUser;
+  const username = user?.displayName;
+
+  axios.post("/api/get-note", { username: username, id: id }).then((d) => {
+    storageRef
+      .child(`notes/${id}/${d.data.name}.pdf`)
+      .getDownloadURL()
+      .then((url) => {
+        window.open(url);
+      });
+  });
+}
 
 export default Row;
