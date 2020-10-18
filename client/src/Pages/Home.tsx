@@ -1,6 +1,8 @@
 import {
-  IconButton,
-  InputAdornment,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   withStyles,
 } from '@material-ui/core';
@@ -8,7 +10,6 @@ import * as firebase from 'firebase/app';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Page from '../Components/Navigation/Page';
-import { Search } from '@material-ui/icons';
 import Note from '../Types/Note';
 import TableComponent from '../Components/Table/Table';
 import { filterBySearchString } from '../Services/TableService';
@@ -20,6 +21,7 @@ export default function Home() {
   const [useFiltereNotes, setUseFilteredNotes] = useState(false);
   const [searchString, setSearchString] = useState('');
   const [loadData, setLoadData] = useState(false);
+  const [timePeriod, setTimePeriod] = useState('');
 
   const handleFilter = (notes: Note[], searchString: string) => {
     setUseFilteredNotes(true);
@@ -34,8 +36,8 @@ export default function Home() {
     fetch('/api/query/time', {
       method: 'POST',
       body: JSON.stringify({
-        timePeriod: 'week',
-        numResults: 10,
+        timePeriod: timePeriod,
+        numResults: 100,
         username: username,
       }),
       headers: {
@@ -46,7 +48,7 @@ export default function Home() {
       .then((data: Note[]) => setTopNotes(data))
       .catch((e) => console.log(e));
     setLoadData(false);
-  }, [loadData]);
+  }, [loadData, timePeriod]);
 
   return (
     <Page request={() => setLoadData(true)}>
@@ -78,7 +80,32 @@ export default function Home() {
 					/>
 				</div> */}
         <div className="top-notes">
-          <p>Top Notes</p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: '2rem',
+            }}
+          >
+            <p>Top Notes</p>
+            <FormControl style={{ minWidth: '120px' }}>
+              <InputLabel id="time-period-select-label">Time Period</InputLabel>
+              <Select
+                labelId="time-period-label-id"
+                id="time-period-select"
+                value={timePeriod}
+                onChange={(e) => setTimePeriod(e.target.value as string)}
+              >
+                <MenuItem value={'day'}>day</MenuItem>
+                <MenuItem value={'week'}>week</MenuItem>
+                <MenuItem value={'month'}>month</MenuItem>
+                <MenuItem value={'year'}>year</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+
           <TableComponent notes={topNotes} />
         </div>
       </div>

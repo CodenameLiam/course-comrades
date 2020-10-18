@@ -25,9 +25,10 @@
     color: $colour-primary;
 
     p {
+      padding-right: 20px;
       font-size: 1.5rem;
       margin: 0rem;
-      margin-bottom: 2rem;
+      margin-top: 16px !important;
     }
   }
 }
