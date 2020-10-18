@@ -318,7 +318,6 @@ app.post('/api/search', async (req, res) => {
       resultId = resultId.concat(tags);
     }
 
-
     // Coursecode filter
 
     let notes = await getNotes(resultId, username);
@@ -345,11 +344,16 @@ app.post('/api/search', async (req, res) => {
 });
 
 // Get note
-app.post('/api/get-note', async (req, res) =>{
+app.post('/api/get-note', async (req, res) => {
   const id = [req.body.id];
   const username = req.body.username;
-  return await getNotes(id, username);
-})
+
+  const note = await getNotes(id, username);
+  console.log(note);
+  res.status(200).send(note[0]);
+
+  // return ;
+});
 
 // Get uploaded notes by a user
 app.post('/api/get-uploaded', async (req, res) => {
@@ -364,8 +368,7 @@ app.post('/api/get-uploaded', async (req, res) => {
     }
     const userNotes = await getNotes(docRef.data().notes, username);
     res.status(200).send(userNotes);
-  } catch (e) {
-  }
+  } catch (e) {}
 });
 
 app.post('/api/get-hashtags', async (req, res) => {

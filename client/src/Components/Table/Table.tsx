@@ -17,19 +17,19 @@ type TableComponentProps = {
   notes: Note[];
 };
 
-const useStyles = makeStyles({
-  container: {
-    maxHeight: 440,
-  },
-});
+// const useStyles = makeStyles({
+//   container: {
+//     maxHeight: "100%",
+//   },
+// });
 
 const TableComponent = (props: TableComponentProps) => {
   const { notes } = props;
-  const classes = useStyles();
+  // const classes = useStyles();
 
   return (
     <>
-      <TableContainer className={classes.container} component={Paper}>
+      <TableContainer className={"note-table"} component={Paper}>
         <Table stickyHeader className="table" aria-label="top notes">
           <TableHead>
             <TableRow>
