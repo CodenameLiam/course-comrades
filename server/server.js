@@ -347,12 +347,8 @@ app.post('/api/search', async (req, res) => {
 app.post('/api/get-note', async (req, res) => {
   const id = [req.body.id];
   const username = req.body.username;
-
-  const note = await getNotes(id, username);
-  console.log(note);
-  res.status(200).send(note[0]);
-
-  // return ;
+  const notes = await getNotes(id, username);
+  res.status(200).send(notes[0]);
 });
 
 // Get uploaded notes by a user

@@ -25,6 +25,16 @@ export default function LikedNotes() {
     setFilteredNotes(filteredNoteArray);
   };
 
+  const handleEnterSearch = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    notes: Note[],
+    searchString: string,
+  ) => {
+    if (e.key === 'Enter') {
+      handleFilter(notes, searchString);
+    }
+  };
+
   const user = firebase.auth().currentUser;
   const username = user?.displayName;
 
@@ -54,6 +64,7 @@ export default function LikedNotes() {
               placeholder="Search your notes..."
               variant="outlined"
               fullWidth
+              onKeyDown={(e) => handleEnterSearch(e, likedNotes, searchString)}
               onChange={(e) => setSearchString(e.target.value)}
               InputProps={{
                 endAdornment: (

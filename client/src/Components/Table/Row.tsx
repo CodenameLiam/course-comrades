@@ -48,6 +48,28 @@ const Row = (props: RowComponentProps) => {
     }
   };
 
+  const unlike = (e: any, username: string, noteId: string): void => {
+    // console.log("");
+    e.stopPropagation();
+    if (liked !== false) {
+      fetch("/api/unlike-note", {
+        method: "POST",
+        body: JSON.stringify({
+          username: username,
+          noteId: noteId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then(() => {
+          setLikes(note.likes - 1);
+          setLiked(false);
+        })
+        .catch((e) => console.log(e));
+    }
+  };
+
   const downloadPost = (e: any) => {
     e.stopPropagation();
     download(note.id, note.name);
@@ -66,7 +88,13 @@ const Row = (props: RowComponentProps) => {
       </TableCell>
       <TableCell align="center">{likes || note.likes}</TableCell>
       <TableCell align="center">
-        <IconButton onClick={(e) => likePost(e, username as string, note.id)}>
+        <IconButton
+          onClick={(e) =>
+            liked === false
+              ? likePost(e, username as string, note.id)
+              : unlike(e, username as string, note.id)
+          }
+        >
           <ThumbUpIcon {...(liked ? { style: { fill: "green" } } : {})} />
         </IconButton>
       </TableCell>
