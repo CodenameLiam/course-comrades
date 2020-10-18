@@ -31,7 +31,6 @@ export default function Header(props: IHeaderProps) {
     if (location.pathname == "/search-notes") {
       location.state = { search: search };
       props.request();
-      // console.log("hello");
     } else {
       history.push("/search-notes", { search: search });
     }
@@ -40,8 +39,12 @@ export default function Header(props: IHeaderProps) {
   const handleEnterSearch = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      history.push("/search-notes", { search: search });
-      // console.log('enter press here! ')
+      if (location.pathname == "/search-notes") {
+        location.state = { search: search };
+        props.request();
+      } else {
+        history.push("/search-notes", { search: search });
+      }
     }
   };
 
