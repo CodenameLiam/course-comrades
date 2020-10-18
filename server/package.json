@@ -12,6 +12,7 @@
   "author": "Liam Percy",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/cloudbuild": "^2.0.3",
     "axios": "^0.20.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -31,5 +32,8 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ]
+  },
+  "engines": {
+    "node" : "=14.14.0"
   }
 }

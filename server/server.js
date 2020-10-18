@@ -9,6 +9,8 @@ import path from 'path';
 // Lodash array utils
 import _ from 'lodash';
 
+// Get google build storage
+import { CloudBuildClient } from '@google-cloud/cloudbuild';
 // Load SwaggerUI
 
 import swaggerUI from 'swagger-ui-express';
@@ -294,23 +296,35 @@ app.post('/api/get-liked-notes', async (req, res) => {
 app.get('/api/search', async (req, res) => {
   try {
     let resultId = [];
+    let resultIdtmp = [];
     const faculty = req.body.faculty;
     const hashtags = req.body.hashtags;
     const semester = req.body.semester;
     const courseCode = req.body.courseCode;
     const username = req.body.username;
+    const noteName = req.body.noteName;
 
-    console.log(faculty, hashtags, semester, courseCode);
-
-    const temp = await courseCodeQuery(courseCode);
-    if (courseCode !== undefined) {
-      resultId = resultId.concat(await courseCodeQuery(courseCode));
-    }
+    // Hashtag query
     if (hashtags !== undefined) {
-      resultId = Array.from(new Set(resultId.concat(await hashtagQuery(hashtags))));
+      const tags = await hashtagQuery(hashtags);
+      resultId.concat(tags);
     }
+    // Notename query
+    if (noteName !== undefined) {
+      const noteRef = await notesDB.listDocuments();
+      const resultIdtmp = noteRef
+        .filter((value) => value.name.includes(noteName))
+        .map((note) => note.id);
+      resultId = Array.from(new Set(resultIdtmp.concat(resultId)));
+    }
+
+    // Coursecode filter
 
     let notes = await getNotes(resultId, username);
+
+    if (courseCode !== undefined) {
+      notes = notes.filter((value) => value.courseCode === courseCode);
+    }
 
     notes = notes.filter((note) => {
       let valid = true;
@@ -320,12 +334,11 @@ app.get('/api/search', async (req, res) => {
       if (valid && faculty !== undefined) {
         valid = note.faculty === faculty;
       }
-      console.log(valid);
       return valid;
     });
     console.log(notes);
 
-    res.status(200).send(res);
+    res.status(200).send(notes);
   } catch (e) {
     res.status(500).send(e);
   }
@@ -352,6 +365,12 @@ app.get('/api/get-hashtags', async (req, res) => {
   const hashtags = docRef.map((it) => it.id);
   console.log(hashtags);
   res.status(200).send(hashtags);
+});
+
+app.post('/api/get-courses', async (req, res) => {
+  const docRef = await course2NotesDB.listDocuments();
+  const courses = docRef.map((it) => it.id);
+  res.status(200).send(courses);
 });
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
