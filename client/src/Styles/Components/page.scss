@@ -1,24 +1,26 @@
 .page {
-	height: calc(100vh - 5rem);
-	width: 100%;
+  height: calc(100vh - 5rem);
+  width: 100%;
 
-	.content {
-		display: flex;
-		height: 100%;
-		position: relative;
+  .content {
+    display: flex;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
 
-		.navigation {
-			height: 100%;
-			background: $grey-0;
-			z-index: 5;
-		}
+    .navigation {
+      height: 100%;
+      background: $grey-0;
+      z-index: 5;
+    }
 
-		.body {
-			width: 100%;
-		}
-	}
+    .body {
+      width: 100%;
+      overflow: auto;
+    }
+  }
 }
 
 .MuiButton-textPrimary {
-	color: white !important;
+  color: white !important;
 }

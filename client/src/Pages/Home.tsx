@@ -1,23 +1,25 @@
-import { IconButton, InputAdornment, TextField, withStyles } from "@material-ui/core";
-import * as firebase from "firebase/app";
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import Page from "../Components/Navigation/Page";
-import { Search } from "@material-ui/icons";
-import Note from "../Types/Note";
-import TableComponent from "../Components/Table/Table";
-import { filterBySearchString } from "../Services/TableService";
+import {
+  IconButton,
+  InputAdornment,
+  TextField,
+  withStyles,
+} from '@material-ui/core';
+import * as firebase from 'firebase/app';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import Page from '../Components/Navigation/Page';
+import { Search } from '@material-ui/icons';
+import Note from '../Types/Note';
+import TableComponent from '../Components/Table/Table';
+import { filterBySearchString } from '../Services/TableService';
 
 export default function Home() {
   const history = useHistory();
   const [topNotes, setTopNotes] = useState<Note[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
   const [useFiltereNotes, setUseFilteredNotes] = useState(false);
-  const [searchString, setSearchString] = useState("");
+  const [searchString, setSearchString] = useState('');
   const [loadData, setLoadData] = useState(false);
-
-  const user = firebase.auth().currentUser;
-  const username = user?.displayName;
 
   const handleFilter = (notes: Note[], searchString: string) => {
     setUseFilteredNotes(true);
@@ -25,16 +27,19 @@ export default function Home() {
     setFilteredNotes(filteredNoteArray);
   };
 
+  const user = firebase.auth().currentUser;
+  const username = user?.displayName;
+
   useEffect(() => {
-    fetch("/api/query/time", {
-      method: "POST",
+    fetch('/api/query/time', {
+      method: 'POST',
       body: JSON.stringify({
-        timePeriod: "week",
+        timePeriod: 'week',
         numResults: 10,
         username: username,
       }),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     })
       .then((res) => res.json())
@@ -87,31 +92,31 @@ export default function Home() {
 
 export const SearchTextField = withStyles({
   root: {
-    "& .MuiOutlinedInput-root": {
+    '& .MuiOutlinedInput-root': {
       borderRadius: 100,
-      boxShadow: "2px 2px 5px #dddddd",
-      background: "#51247a",
-      "& input": {
-        background: "#ffffff",
-        borderRadius: "100rem 0rem 0rem 100rem",
+      boxShadow: '2px 2px 5px #dddddd',
+      background: '#51247a',
+      '& input': {
+        background: '#ffffff',
+        borderRadius: '100rem 0rem 0rem 100rem',
       },
-      "& fieldset": {
-        transition: "box-shadow 0.3s",
-        borderColor: "#dddddd",
+      '& fieldset': {
+        transition: 'box-shadow 0.3s',
+        borderColor: '#dddddd',
       },
-      "&:hover fieldset": {
-        borderColor: "#dddddd",
-        boxShadow: "2px 2px 10px #dddddd",
+      '&:hover fieldset': {
+        borderColor: '#dddddd',
+        boxShadow: '2px 2px 10px #dddddd',
       },
-      "&.Mui-focused fieldset": {
-        borderColor: "#dddddd",
-        boxShadow: "2px 2px 10px #dddddd",
+      '&.Mui-focused fieldset': {
+        borderColor: '#dddddd',
+        boxShadow: '2px 2px 10px #dddddd',
       },
     },
-    "& .Mui-error": {
-      "& fieldset": {
-        transition: "box-shadow 0.3s",
-        borderColor: "#e62645",
+    '& .Mui-error': {
+      '& fieldset': {
+        transition: 'box-shadow 0.3s',
+        borderColor: '#e62645',
       },
     },
   },

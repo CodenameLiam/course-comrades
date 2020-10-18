@@ -9,7 +9,7 @@ import path from 'path';
 // Lodash array utils
 import _ from 'lodash';
 
-``//  google build storage
+// Get google build storage
 // import { CloudBuildClient } from '@google-cloud/cloudbuild';
 // Load SwaggerUI
 
@@ -318,7 +318,6 @@ app.post('/api/search', async (req, res) => {
       resultId = resultId.concat(tags);
     }
 
-
     // Coursecode filter
 
     let notes = await getNotes(resultId, username);
@@ -345,7 +344,7 @@ app.post('/api/search', async (req, res) => {
 });
 
 // Get note
-app.post('/api/get-note', async (req, res) =>{
+app.post('/api/get-note', async (req, res) => {
   const id = [req.body.id];
   const username = req.body.username;
   const notes = await getNotes(id, username);
@@ -365,8 +364,7 @@ app.post('/api/get-uploaded', async (req, res) => {
     }
     const userNotes = await getNotes(docRef.data().notes, username);
     res.status(200).send(userNotes);
-  } catch (e) {
-  }
+  } catch (e) {}
 });
 
 app.post('/api/get-hashtags', async (req, res) => {
