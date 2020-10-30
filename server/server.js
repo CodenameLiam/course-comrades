@@ -9,6 +9,7 @@ import path from 'path';
 // Lodash array utils
 import _ from 'lodash';
 
+import moment from 'moment';
 // Get google build storage
 // import { CloudBuildClient } from '@google-cloud/cloudbuild';
 // Load SwaggerUI
@@ -241,24 +242,27 @@ app.post('/api/add-download', async (req, res) => {
 
 // Query by likes and time
 app.post('/api/query/time/', async (req, res) => {
-  const timePeriod = req.query.timePeriod;
+  const timePeriod = req.body.timePeriod;
   const numResults = parseInt(req.query.numResults) || 100;
   const username = req.body.username;
 
-  const fromDate = new Date();
-  fromDate.setHours(0, 0, 0, 0);
+  let fromDate = moment();
+  // fromDate.setHours(0, 0, 0, 0);
   switch (timePeriod) {
     case 'day':
+      fromDate = fromDate.toDate().subtract(1, 'days').toDate();
       break;
     case 'week':
-      fromDate.setDate(fromDate.getDate - 7);
+      fromDate = fromDate.subtract(7, 'days').toDate();
       break;
     case 'month':
-      fromDate.setDate(fromDate.getDate - 31);
+      fromDate = fromDate.subtract(31, 'days').toDate();
       break;
     case 'year':
-      fromDate.setDate(fromDate.getDate - 365);
+      fromDate = fromDate.subtract(365, 'days').toDate();
       break;
+    default:
+      fromDate = fromDate.subtract(7, 'days').toDate();
   }
 
   const timestampDate = admin.firestore.Timestamp.fromDate(fromDate);
